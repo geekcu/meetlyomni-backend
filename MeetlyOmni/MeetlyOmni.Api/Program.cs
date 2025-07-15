@@ -1,4 +1,11 @@
+using MeetlyOmni.Api.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Set up the database context with PostgreSQL
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("MeetlyOmniDb")));
 
 // Add services to the container.
 
