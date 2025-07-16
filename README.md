@@ -20,9 +20,11 @@ This project is a .NET 8 Web API backend supporting the Meetly Omni application.
 ### 1. Set up PostgreSQL
 
 Make sure PostgreSQL is installed and running. Create a database (e.g. `MeetlyOmniDb`), and update the connection string in:
+
 ```
 appsettings.Development.json
 ```
+
 Example:
 
 ```json
@@ -34,62 +36,69 @@ Example:
 ### 2. Apply EF Core Migrations
 
 Make sure the .NET CLI is installed and EF tools are available. Then run:
-```json
+
+```bash
 dotnet ef database update
 ```
+
 This command will apply the migrations and create the necessary schema in your PostgreSQL database.
 
 ### 3. Run the Application
+
 To start the backend server in development mode, run:
-```json
+
+```bash
 dotnet run --project MeetlyOmni.Api
 ```
+
 The API will be accessible at https://localhost:5001 or http://localhost:5000 depending on your launch settings.
 
 ## Available Scripts
 
-| Command                           | Description                                    |
-| --------------------------------- | ---------------------------------------------- |
-| `dotnet run`                      | Runs the application.                          |
-| `dotnet build`                    | Builds the solution.                           |
-| `dotnet test`                     | Runs all unit tests.                           |
+| Command                            | Description                                    |
+|------------------------------------|------------------------------------------------|
+| `dotnet run`                       | Runs the application.                          |
+| `dotnet build`                     | Builds the solution.                           |
+| `dotnet test`                      | Runs all unit tests.                           |
 | `dotnet ef migrations add <Name>` | Creates a new EF Core migration.               |
 | `dotnet ef database update`       | Applies the latest migrations to the database. |
 
-
 ## Testing
+
 The solution includes test projects using xUnit and Moq.
+
 To run tests:
-```json
+
+```bash
 dotnet test
 ```
 
 ## API Documentation
+
 Swagger is enabled. Once the application is running, you can view the API docs at:
 
-https://localhost:5001/swagger
+[https://localhost:5001/swagger](https://localhost:5001/swagger)
 
 ## Project Structure
 
 ```
 MeetlyOmni.Backend/
-©À©¤©¤ MeetlyOmni.Api/ # Main Web API project
-©¦ ©À©¤©¤ Constants/ # Constant values and keys
-©¦ ©À©¤©¤ Controllers/ # API endpoints/controllers
-©¦ ©À©¤©¤ Data/ # DB context or seeders
-©¦ ©À©¤©¤ DTOs/ # Data transfer objects
-©¦ ©À©¤©¤ Entities/ # EF Core entity models
-©¦ ©À©¤©¤ Enums/ # Enum definitions
-©¦ ©À©¤©¤ Exceptions/ # Custom exception handling
-©¦ ©À©¤©¤ Middlewares/ # Custom middleware logic
-©¦ ©À©¤©¤ Migrations/ # EF Core migrations
-©¦ ©À©¤©¤ Repository/ # Repository interfaces and implementations
-©¦ ©À©¤©¤ Service/ # Business logic and service layer
-©¦ ©À©¤©¤ appsettings.json # Main configuration file
-©¦ ©À©¤©¤ MappingProfile.cs # AutoMapper profile
-©¦ ©À©¤©¤ MeetlyOmni.Api.http # HTTP test file
-©¦ ©¸©¤©¤ Program.cs # Application entry point
-©À©¤©¤ MeetlyOmni.Tests/ # xUnit test project
-©¸©¤©¤ README.md # Project documentation
+â”œâ”€â”€ MeetlyOmni.Api/             # Main Web API project
+â”‚   â”œâ”€â”€ Constants/              # Constant values and keys
+â”‚   â”œâ”€â”€ Controllers/            # API endpoints/controllers
+â”‚   â”œâ”€â”€ Data/                   # DB context or seeders
+â”‚   â”œâ”€â”€ DTOs/                   # Data transfer objects
+â”‚   â”œâ”€â”€ Entities/               # EF Core entity models
+â”‚   â”œâ”€â”€ Enums/                  # Enum definitions
+â”‚   â”œâ”€â”€ Exceptions/             # Custom exception handling
+â”‚   â”œâ”€â”€ Middlewares/            # Custom middleware logic
+â”‚   â”œâ”€â”€ Migrations/             # EF Core migrations
+â”‚   â”œâ”€â”€ Repository/             # Repository interfaces and implementations
+â”‚   â”œâ”€â”€ Service/                # Business logic and service layer
+â”‚   â”œâ”€â”€ appsettings.json        # Main configuration file
+â”‚   â”œâ”€â”€ MappingProfile.cs       # AutoMapper profile
+â”‚   â”œâ”€â”€ MeetlyOmni.Api.http     # HTTP test file
+â”‚   â””â”€â”€ Program.cs              # Application entry point
+â”œâ”€â”€ MeetlyOmni.Tests/           # xUnit test project
+â””â”€â”€ README.md                   # Project documentation
 ```
-
