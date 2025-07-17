@@ -18,10 +18,10 @@ namespace MeetlyOmni.Api.Entities
         public required string MemberId { get; set; }
 
         [MaxLength(30)]
-        public string? IssuedBy { get; set; }
+        public RaffleIssuedSource? IssuedBy { get; set; }
         public RaffleTicketStatus Status { get; set; } = RaffleTicketStatus.Unused;
 
-        public DateTime IssueTime { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset IssueTime { get; set; } = DateTimeOffset.UtcNow;
 
         // Navigation
         public Member? Member { get; set; }

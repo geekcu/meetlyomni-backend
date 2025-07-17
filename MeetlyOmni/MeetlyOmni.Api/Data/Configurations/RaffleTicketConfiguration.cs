@@ -11,10 +11,16 @@ namespace MeetlyOmni.Api.Data.Configurations
         public void Configure(EntityTypeBuilder<RaffleTicket> builder)
         {
             var statusConverter = new EnumToStringConverter<RaffleTicketStatus>();
+            var issuedSource = new EnumToStringConverter<RaffleIssuedSource>();
+
             builder.Property(r => r.Status)
                    .HasConversion(statusConverter)
                    .HasMaxLength(20)
                    .HasColumnType("varchar(20)");
+
+            builder.Property(r => r.IssuedBy)
+                   .HasConversion(issuedSource)
+                   .HasMaxLength(20);
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MeetlyOmni.Api.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MeetlyOmni.Api.Entities
@@ -17,7 +18,7 @@ namespace MeetlyOmni.Api.Entities
         public Guid OrgId { get; set; }
 
         [MaxLength(50)]
-        public required string EventType { get; set; }
+        public required MemberEventType EventType { get; set; }
 
         public string? EventDetail { get; set; } // JSONB → string
 

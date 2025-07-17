@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MeetlyOmni.Api.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace MeetlyOmni.Api.Entities
 {
@@ -28,10 +29,10 @@ namespace MeetlyOmni.Api.Entities
         public bool IsVerified { get; set; } = false;
 
         [MaxLength(20)]
-        public string PlanType { get; set; } = "Free";
+        public PlanType PlanType { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 
         // Navigation
         public ICollection<Member> Members { get; set; } = new List<Member>();
