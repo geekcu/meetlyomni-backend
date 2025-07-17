@@ -8,13 +8,22 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
+
+var connectionString = builder.Configuration.GetConnectionString("MeetlyOmniDb");
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("Database connection string 'MeetlyOmniDb' is not configured.");
+}
+
 // PostgreSQL DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("MeetlyOmniDb")));
+    options.UseNpgsql(connectionString));
 
 // Health Check
 builder.Services.AddHealthChecks()
-    .AddNpgSql(builder.Configuration.GetConnectionString("MeetlyOmniDb")!);
+    .AddNpgSql(connectionString);
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

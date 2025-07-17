@@ -22,7 +22,7 @@ namespace MeetlyOmni.Api.Entities
 
         public string? EventDetail { get; set; } // JSONB → string
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
         // Navigation
         public Member? Member { get; set; }
