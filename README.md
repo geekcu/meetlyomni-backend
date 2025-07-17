@@ -19,18 +19,13 @@ This project is a .NET 8 Web API backend supporting the Meetly Omni application.
 
 ### 1. Set up PostgreSQL
 
-Make sure PostgreSQL is installed and running. Create a database (e.g. `MeetlyOmniDb`), and update the connection string in:
+Make sure PostgreSQL is installed and running. Create a database (e.g. MeetlyOmniDb).
 
+Instead of hardcoding credentials in appsettings.Development.json, inject the connection string using .NET User Secrets (for local development) or environment variables (for production).
+
+Set the connection string like this:
 ```
-appsettings.Development.json
-```
-
-Example:
-
-```json
-"ConnectionStrings": {
-  "MeetlyOmniDb": "Host=localhost;Port=5432;Database=MeetlyOmniDb;Username=postgres;Password=yourpassword"
-}
+dotnet user-secrets set "ConnectionStrings:MeetlyOmniDb" "Host=localhost;Port=5432;Database=MeetlyOmniDb;Username=postgres;Password=yourpassword"
 ```
 
 ### 2. Apply EF Core Migrations
