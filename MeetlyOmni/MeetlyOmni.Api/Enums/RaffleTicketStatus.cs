@@ -2,7 +2,7 @@
 {
     public enum RaffleTicketStatus
     {
-        Used,
-        Unused
+        Unused,
+        Used
     }
 }
