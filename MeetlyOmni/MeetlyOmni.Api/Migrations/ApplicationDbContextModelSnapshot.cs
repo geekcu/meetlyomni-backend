@@ -18,7 +18,7 @@ namespace MeetlyOmni.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -74,9 +74,11 @@ namespace MeetlyOmni.Api.Migrations
                         .HasColumnType("character varying(20)")
                         .HasDefaultValue("Active");
 
-                    b.PrimitiveCollection<List<string>>("Tags")
+                    b.Property<List<string>>("Tags")
                         .IsRequired()
-                        .HasColumnType("jsonb");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValueSql("'[]'::jsonb");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -103,7 +105,7 @@ namespace MeetlyOmni.Api.Migrations
                     b.Property<string>("EventType")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("MemberId")
                         .IsRequired()
@@ -131,7 +133,7 @@ namespace MeetlyOmni.Api.Migrations
                     b.Property<string>("CoverImageUrl")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
@@ -140,7 +142,7 @@ namespace MeetlyOmni.Api.Migrations
                     b.Property<int>("FollowerCount")
                         .HasColumnType("integer");
 
-                    b.PrimitiveCollection<List<string>>("IndustryTags")
+                    b.Property<List<string>>("IndustryTags")
                         .HasColumnType("jsonb");
 
                     b.Property<bool>("IsVerified")
@@ -165,10 +167,12 @@ namespace MeetlyOmni.Api.Migrations
 
                     b.Property<string>("PlanType")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("Free");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("WebsiteUrl")
@@ -185,12 +189,12 @@ namespace MeetlyOmni.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("IssueTime")
+                    b.Property<DateTimeOffset>("IssueTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("IssuedBy")
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("MemberId")
                         .IsRequired()

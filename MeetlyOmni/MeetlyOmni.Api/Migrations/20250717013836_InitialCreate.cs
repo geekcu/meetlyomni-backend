@@ -27,9 +27,9 @@ namespace MeetlyOmni.Api.Migrations
                     IndustryTags = table.Column<List<string>>(type: "jsonb", nullable: true),
                     FollowerCount = table.Column<int>(type: "integer", nullable: false),
                     IsVerified = table.Column<bool>(type: "boolean", nullable: false),
-                    PlanType = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    PlanType = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false, defaultValue: "Free"),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -48,7 +48,7 @@ namespace MeetlyOmni.Api.Migrations
                     Nickname = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     LanguagePref = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    Tags = table.Column<List<string>>(type: "jsonb", nullable: false),
+                    Tags = table.Column<List<string>>(type: "jsonb", nullable: false, defaultValueSql: "'[]'::jsonb"),
                     Points = table.Column<int>(type: "integer", nullable: false),
                     Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false, defaultValue: "Active"),
                     LastLogin = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -73,7 +73,7 @@ namespace MeetlyOmni.Api.Migrations
                     LogId = table.Column<Guid>(type: "uuid", nullable: false),
                     MemberId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     OrgId = table.Column<Guid>(type: "uuid", nullable: false),
-                    EventType = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    EventType = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
                     EventDetail = table.Column<string>(type: "jsonb", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -101,9 +101,9 @@ namespace MeetlyOmni.Api.Migrations
                     TicketId = table.Column<Guid>(type: "uuid", nullable: false),
                     OrgId = table.Column<Guid>(type: "uuid", nullable: false),
                     MemberId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    IssuedBy = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true),
+                    IssuedBy = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     Status = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
-                    IssueTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    IssueTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
