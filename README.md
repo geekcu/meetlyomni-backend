@@ -78,22 +78,30 @@ Swagger is enabled. Once the application is running, you can view the API docs a
 
 ```
 MeetlyOmni.Backend/
-├── MeetlyOmni.Api/             # Main Web API project
-│   ├── Constants/              # Constant values and keys
-│   ├── Controllers/            # API endpoints/controllers
-│   ├── Data/                   # DB context or seeders
-│   ├── DTOs/                   # Data transfer objects
-│   ├── Entities/               # EF Core entity models
-│   ├── Enums/                  # Enum definitions
-│   ├── Exceptions/             # Custom exception handling
-│   ├── Middlewares/            # Custom middleware logic
-│   ├── Migrations/             # EF Core migrations
-│   ├── Repository/             # Repository interfaces and implementations
-│   ├── Service/                # Business logic and service layer
-│   ├── appsettings.json        # Main configuration file
-│   ├── MappingProfile.cs       # AutoMapper profile
-│   ├── MeetlyOmni.Api.http     # HTTP test file
-│   └── Program.cs              # Application entry point
-├── MeetlyOmni.Tests/           # xUnit test project
-└── README.md                   # Project documentation
+├── MeetlyOmni.Api/               # Main Web API project
+│   ├── Common/                   # Shared helpers, utilities, extensions
+│   ├── Controllers/              # API controllers (route entry points)
+│   ├── Data/                     # Data access layer
+│   │   ├── Configurations/       # Entity configurations (Fluent API)
+│   │   ├── Entities/             # EF Core entity models
+│   │   ├── Repository/           # Repository interfaces and implementations
+│   │   └── ApplicationDbContext.cs  # EF Core database context
+│   ├── Filters/                  # Action and exception filters
+│   ├── Mapping/                  # AutoMapper configuration
+│   ├── Middlewares/             # Custom middleware components
+│   ├── Migrations/              # EF Core migration files
+│   ├── Models/                  # View models / DTOs
+│   ├── Properties/              # Project properties (e.g., launchSettings.json)
+│   ├── Service/                 # Business logic services
+│   ├── appsettings.Development.json  # Development environment config
+│   ├── appsettings.json         # Default application configuration
+│   ├── MeetlyOmni.Api.csproj    # API project file
+│   ├── MeetlyOmni.Api.http      # HTTP test requests file
+│   └── Program.cs               # Application entry point
+├── MeetlyOmni.Tests/            # xUnit test project
+│   └── ...                      # Unit test files
+├── global.json                  # SDK version configuration
+├── MeetlyOmni.sln               # Solution file
+├── .gitignore                   # Git ignore rules
+└── README.md                    # Project documentation
 ```
