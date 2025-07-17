@@ -1,7 +1,7 @@
-﻿using MeetlyOmni.Api.Entities;
-using MeetlyOmni.Api.Enums;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+using MeetlyOmni.Api.Entities;
+using MeetlyOmni.Api.Enums;
 
 namespace MeetlyOmni.Api.Data.Configurations
 {
@@ -10,7 +10,8 @@ namespace MeetlyOmni.Api.Data.Configurations
         public void Configure(EntityTypeBuilder<Member> builder)
         {
             builder.Property(m => m.Tags)
-                   .HasColumnType("jsonb");
+                   .HasColumnType("jsonb")
+                   .HasDefaultValueSql("'[]'::jsonb"); // avoid null
 
             builder.Property(m => m.Status)
                    .HasConversion<string>()
@@ -19,3 +20,4 @@ namespace MeetlyOmni.Api.Data.Configurations
         }
     }
 }
+
