@@ -19,33 +19,7 @@ namespace MeetlyOmni.Api.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // JSONB List<string> mapping to PostgreSQL jsonb type
-            modelBuilder.Entity<Member>()
-                .Property(m => m.Tags)
-                .HasColumnType("jsonb");
-
-            modelBuilder.Entity<Organization>()
-                .Property(o => o.IndustryTags)
-                .HasColumnType("jsonb");
-
-            modelBuilder.Entity<MemberActivityLog>()
-                .Property(a => a.EventDetail)
-                .HasColumnType("jsonb");
-
-            modelBuilder.Entity<RaffleTicket>()
-                .Property(r => r.Status)
-                .HasConversion(
-                    v => v.ToString().ToLower(),     // convert enum to string to database
-                    v => Enum.Parse<RaffleTicketStatus>(v, true) // ignore case when reading from database
-                )
-                .HasMaxLength(20)
-                .HasColumnType("varchar(20)");
-
-            modelBuilder.Entity<Member>()
-                .Property(m => m.Status)
-                .HasConversion<string>() // convert enum to string to database
-                .HasMaxLength(20)
-                .HasDefaultValue(MemberStatus.Active);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
             base.OnModelCreating(modelBuilder);
         }
