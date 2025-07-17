@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MeetlyOmni.Api.Entities;
-using MeetlyOmni.Api.Enums;
+using MeetlyOmni.Api.Common.Enums;
+using MeetlyOmni.Api.Data.Entities;
 
 namespace MeetlyOmni.Api.Data.Configurations
 {

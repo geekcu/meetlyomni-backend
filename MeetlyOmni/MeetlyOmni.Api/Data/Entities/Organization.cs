@@ -1,7 +1,7 @@
-﻿using MeetlyOmni.Api.Enums;
+﻿using MeetlyOmni.Api.Common.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace MeetlyOmni.Api.Entities
+namespace MeetlyOmni.Api.Data.Entities
 {
     public class Organization
     {

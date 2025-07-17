@@ -1,8 +1,8 @@
-﻿using MeetlyOmni.Api.Entities;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using MeetlyOmni.Api.Enums;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using MeetlyOmni.Api.Common.Enums;
+using MeetlyOmni.Api.Data.Entities;
 
 namespace MeetlyOmni.Api.Data.Configurations
 {

@@ -1,4 +1,5 @@
 using MeetlyOmni.Api.Data;
+using MeetlyOmni.Api.Mapping;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +29,9 @@ builder.Services.AddHealthChecks()
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Register AutoMapper and scan for profiles starting from MappingProfile's assembly
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 

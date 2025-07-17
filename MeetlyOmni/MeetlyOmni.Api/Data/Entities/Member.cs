@@ -1,8 +1,8 @@
-﻿using MeetlyOmni.Api.Enums;
+﻿using MeetlyOmni.Api.Common.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MeetlyOmni.Api.Entities
+namespace MeetlyOmni.Api.Data.Entities
 {
     public class Member
     {

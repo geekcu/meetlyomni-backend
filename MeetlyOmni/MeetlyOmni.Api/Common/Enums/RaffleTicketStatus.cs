@@ -1,4 +1,4 @@
-﻿namespace MeetlyOmni.Api.Enums
+﻿namespace MeetlyOmni.Api.Common.Enums
 {
     public enum RaffleTicketStatus
     {

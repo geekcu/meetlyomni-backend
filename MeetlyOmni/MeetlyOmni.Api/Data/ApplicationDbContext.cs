@@ -1,4 +1,4 @@
-﻿using MeetlyOmni.Api.Entities;
+﻿using MeetlyOmni.Api.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace MeetlyOmni.Api.Data
