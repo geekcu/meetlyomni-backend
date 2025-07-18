@@ -1,4 +1,4 @@
-﻿namespace MeetlyOmni.Api.Common.Enums
+﻿namespace MeetlyOmni.Api.Common.Enums.Members
 {
     public enum MemberStatus
     {

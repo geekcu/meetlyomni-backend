@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MeetlyOmni.Api.Common.Enums;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MeetlyOmni.Api.Common.Enums.MemberActivityLog;
+using MeetlyOmni.Api.Common.Extensions;
 using MeetlyOmni.Api.Data.Entities;
 
 namespace MeetlyOmni.Api.Data.Configurations
@@ -10,16 +10,34 @@ namespace MeetlyOmni.Api.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<MemberActivityLog> builder)
         {
-            var converter = new EnumToStringConverter<MemberEventType>();
+            builder.HasKey(x => x.LogId);
 
-            builder.Property(a => a.EventDetail)
-                   .HasColumnType("jsonb");
+            builder.Property(x => x.MemberId)
+                   .IsRequired()
+                   .HasMaxLength(50);
 
-            builder.Property(a => a.EventType)
-                   .HasConversion(converter)
-                   .HasMaxLength(50)
-                   .HasColumnType("varchar(50)");
+            builder.Property(x => x.OrgId)
+                   .IsRequired();
+
+            builder.ConfigureEnumAsString<MemberEventType>(
+                nameof(MemberActivityLog.EventType),
+                maxLength: 50,
+                columnType: "varchar(50)"
+            );
+
+            builder.ConfigureJsonbObject(nameof(MemberActivityLog.EventDetail));
+
+            builder.Property(x => x.CreatedAt)
+                   .HasDefaultValueSql("NOW()");
+
+            // foreign key relationships
+            builder.HasOne(x => x.Member)
+                   .WithMany(m => m.ActivityLogs)
+                   .HasForeignKey(x => x.MemberId);
+
+            builder.HasOne(x => x.Organization)
+                   .WithMany(o => o.ActivityLogs)
+                   .HasForeignKey(x => x.OrgId);
         }
     }
-
 }

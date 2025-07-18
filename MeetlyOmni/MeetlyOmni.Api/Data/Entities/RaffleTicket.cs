@@ -1,31 +1,23 @@
-﻿using MeetlyOmni.Api.Common.Enums;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using MeetlyOmni.Api.Common.Enums.RaffleTicket;
 
 namespace MeetlyOmni.Api.Data.Entities
 {
     public class RaffleTicket
     {
-        [Key]
-        public Guid TicketId { get; set; } = Guid.NewGuid();
+        public Guid TicketId { get; set; }
 
-        [Required]
-        [ForeignKey(nameof(Organization))]
         public Guid OrgId { get; set; }
 
-        [Required]
-        [MaxLength(50)]
-        public required string MemberId { get; set; }
+        public string MemberId { get; set; } = string.Empty;
 
-        [MaxLength(30)]
         public RaffleIssuedSource? IssuedBy { get; set; }
+
         public RaffleTicketStatus Status { get; set; } = RaffleTicketStatus.Unused;
 
-        public DateTimeOffset IssueTime { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset IssueTime { get; set; }
 
         // Navigation
         public Member? Member { get; set; }
         public Organization? Organization { get; set; }
     }
-
 }

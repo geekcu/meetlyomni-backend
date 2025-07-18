@@ -1,32 +1,24 @@
-﻿using MeetlyOmni.Api.Common.Enums;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using MeetlyOmni.Api.Common.Enums.MemberActivityLog;
+using System.Text.Json.Nodes;
 
 namespace MeetlyOmni.Api.Data.Entities
 {
     public class MemberActivityLog
     {
-        [Key]
-        public Guid LogId { get; set; } = Guid.NewGuid();
+        public Guid LogId { get; set; }
 
-        [Required]
-        [MaxLength(50)]
-        public required string MemberId { get; set; }
+        public string MemberId { get; set; } = string.Empty;
 
-        [Required]
-        [ForeignKey(nameof(Organization))]
         public Guid OrgId { get; set; }
 
-        [MaxLength(50)]
-        public required MemberEventType EventType { get; set; }
+        public MemberEventType EventType { get; set; }
 
-        public string? EventDetail { get; set; } // JSONB → string
+        public JsonObject? EventDetail { get; set; }
 
-        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset CreatedAt { get; set; }
 
         // Navigation
         public Member? Member { get; set; }
         public Organization? Organization { get; set; }
     }
-
 }

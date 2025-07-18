@@ -1,53 +1,41 @@
-﻿using MeetlyOmni.Api.Common.Enums;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using MeetlyOmni.Api.Common.Enums.Members;
 
 namespace MeetlyOmni.Api.Data.Entities
 {
     public class Member
     {
-        [Key]
-        [MaxLength(50)]
-        public required string MemberId { get; set; } // org_code + local_member_number 
+        public string MemberId { get; set; } = string.Empty;
 
-        [Required]
-        [ForeignKey(nameof(Organization))]
         public Guid OrgId { get; set; }
 
         public int LocalMemberNumber { get; set; }
 
-        [Required, MaxLength(255)]
-        public required string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
-        [Required, MaxLength(255)]
-        public required string PasswordHash { get; set; }
+        public string PasswordHash { get; set; } = string.Empty;
 
-        [MaxLength(100)]
         public string? Nickname { get; set; }
 
-        [MaxLength(20)]
         public string? Phone { get; set; }
 
-        [MaxLength(10)]
         public string LanguagePref { get; set; } = "en";
 
-        public List<string> Tags { get; set; } = new(); // e.g., ["developer", "designer"] a list of string
+        public List<string> Tags { get; set; } = new();
 
         public int Points { get; set; } = 0;
 
-        [Required]
         public MemberStatus Status { get; set; } = MemberStatus.Active;
 
         public DateTime? LastLogin { get; set; }
 
-        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
-        public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset CreatedAt { get; set; }
 
+        public DateTimeOffset UpdatedAt { get; set; }
 
         // Navigation
         public Organization? Organization { get; set; }
         public ICollection<MemberActivityLog> ActivityLogs { get; set; } = new List<MemberActivityLog>();
         public ICollection<RaffleTicket> RaffleTickets { get; set; } = new List<RaffleTicket>();
+        public ICollection<GameRecord> GameRecords { get; set; } = new List<GameRecord>();
     }
-
 }

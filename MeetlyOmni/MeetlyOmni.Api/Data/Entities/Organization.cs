@@ -1,40 +1,40 @@
-﻿using MeetlyOmni.Api.Common.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using MeetlyOmni.Api.Common.Enums.Organization;
 
 namespace MeetlyOmni.Api.Data.Entities
 {
     public class Organization
     {
-        [Key]
-        public Guid OrgId { get; set; } = Guid.NewGuid();
+        public Guid OrgId { get; set; }
 
-        [Required]
-        [MaxLength(30)]
-        public required string OrganizationCode { get; set; }
+        public string OrganizationCode { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(100)]
-        public required string OrganizationName { get; set; }
+        public string OrganizationName { get; set; } = string.Empty;
 
         public string? LogoUrl { get; set; }
         public string? CoverImageUrl { get; set; }
         public string? Description { get; set; }
-        [MaxLength(255)]
+
         public string? Location { get; set; }
+
         public string? WebsiteUrl { get; set; }
 
         public List<string>? IndustryTags { get; set; }
 
         public int FollowerCount { get; set; } = 0;
+
         public bool IsVerified { get; set; } = false;
 
-        [MaxLength(20)]
         public PlanType PlanType { get; set; }
 
-        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
-        public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset CreatedAt { get; set; }
+
+        public DateTimeOffset UpdatedAt { get; set; }
 
         // Navigation
         public ICollection<Member> Members { get; set; } = new List<Member>();
+        public ICollection<Event> Events { get; set; } = new List<Event>();
+        public ICollection<RaffleTicket> RaffleTickets { get; set; } = new List<RaffleTicket>();
+        public ICollection<MemberActivityLog> ActivityLogs { get; set; } = new List<MemberActivityLog>();
+        public ICollection<GameRecord> GameRecords { get; set; } = new List<GameRecord>();
     }
 }

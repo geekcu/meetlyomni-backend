@@ -1,4 +1,4 @@
-﻿namespace MeetlyOmni.Api.Common.Enums
+﻿namespace MeetlyOmni.Api.Common.Enums.Organization
 {
     public enum PlanType
     {
