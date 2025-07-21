@@ -1,7 +1,11 @@
-﻿using System.Text.Json.Nodes;
+// <copyright file="GameRecord.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Entities
 {
+    using System.Text.Json.Nodes;
+
     public class GameRecord
     {
         public Guid RecordId { get; set; }
@@ -20,7 +24,9 @@ namespace MeetlyOmni.Api.Data.Entities
 
         // Navigation
         public EventGameInstance? EventGameInstance { get; set; }
+
         public Organization? Organization { get; set; }
+
         public Member? Member { get; set; }
     }
 }

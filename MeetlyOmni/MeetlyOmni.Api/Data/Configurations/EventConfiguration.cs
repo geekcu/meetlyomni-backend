@@ -1,8 +1,13 @@
-﻿using MeetlyOmni.Api.Common.Enums.Event;
-using MeetlyOmni.Api.Data.Entities;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+// <copyright file="EventConfiguration.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+using MeetlyOmni.Api.Common.Enums.Event;
 using MeetlyOmni.Api.Common.Extensions;
+using MeetlyOmni.Api.Data.Entities;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 public class EventConfiguration : IEntityTypeConfiguration<Event>
 {
@@ -19,7 +24,6 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
         builder.ConfigureEnumAsString<EventStatus>(
             nameof(Event.Status),
             maxLength: 20,
-            defaultValue: EventStatus.Draft
-        );
+            defaultValue: EventStatus.Draft);
     }
 }

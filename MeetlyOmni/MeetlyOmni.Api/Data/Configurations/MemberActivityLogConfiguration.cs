@@ -1,11 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MeetlyOmni.Api.Common.Enums.MemberActivityLog;
-using MeetlyOmni.Api.Common.Extensions;
-using MeetlyOmni.Api.Data.Entities;
+// <copyright file="MemberActivityLogConfiguration.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Configurations
 {
+    using MeetlyOmni.Api.Common.Enums.MemberActivityLog;
+    using MeetlyOmni.Api.Common.Extensions;
+    using MeetlyOmni.Api.Data.Entities;
+
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
     public class MemberActivityLogConfiguration : IEntityTypeConfiguration<MemberActivityLog>
     {
         public void Configure(EntityTypeBuilder<MemberActivityLog> builder)
@@ -22,8 +27,7 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.ConfigureEnumAsString<MemberEventType>(
                 nameof(MemberActivityLog.EventType),
                 maxLength: 50,
-                columnType: "varchar(50)"
-            );
+                columnType: "varchar(50)");
 
             builder.ConfigureJsonbObject(nameof(MemberActivityLog.EventDetail));
 

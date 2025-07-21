@@ -1,4 +1,8 @@
-﻿namespace MeetlyOmni.Api.Common.Enums.EventContentBlock
+// <copyright file="BlockType.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+namespace MeetlyOmni.Api.Common.Enums.EventContentBlock
 {
     public enum BlockType
     {
@@ -7,6 +11,6 @@
         Video,
         Text,
         GuestIntro,
-        GameTrigger
+        GameTrigger,
     }
 }

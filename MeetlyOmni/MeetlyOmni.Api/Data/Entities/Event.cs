@@ -1,7 +1,11 @@
-﻿using MeetlyOmni.Api.Common.Enums.Event;
+// <copyright file="Event.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Entities
 {
+    using MeetlyOmni.Api.Common.Enums.Event;
+
     public class Event
     {
         public Guid EventId { get; set; }
@@ -15,6 +19,7 @@ namespace MeetlyOmni.Api.Data.Entities
         public string? CoverImageUrl { get; set; }
 
         public DateTimeOffset? StartTime { get; set; }
+
         public DateTimeOffset? EndTime { get; set; }
 
         public string? Location { get; set; }
@@ -25,9 +30,11 @@ namespace MeetlyOmni.Api.Data.Entities
 
         // Navigation
         public Organization? Organization { get; set; }
-        public ICollection<Guest> Guests { get; set; } = new List<Guest>();
-        public ICollection<EventContentBlock> ContentBlocks { get; set; } = new List<EventContentBlock>();
-        public ICollection<EventGameInstance> EventGameInstances { get; set; } = new List<EventGameInstance>();
 
+        public ICollection<Guest> Guests { get; set; } = new List<Guest>();
+
+        public ICollection<EventContentBlock> ContentBlocks { get; set; } = new List<EventContentBlock>();
+
+        public ICollection<EventGameInstance> EventGameInstances { get; set; } = new List<EventGameInstance>();
     }
 }

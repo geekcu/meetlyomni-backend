@@ -1,10 +1,15 @@
-﻿using MeetlyOmni.Api.Common.Extensions;
-using MeetlyOmni.Api.Data.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+// <copyright file="GameRecordConfiguration.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Configurations
 {
+    using MeetlyOmni.Api.Common.Extensions;
+    using MeetlyOmni.Api.Data.Entities;
+
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
     public class GameRecordConfiguration : IEntityTypeConfiguration<GameRecord>
     {
         public void Configure(EntityTypeBuilder<GameRecord> builder)

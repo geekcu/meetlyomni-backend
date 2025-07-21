@@ -1,7 +1,11 @@
-﻿using MeetlyOmni.Api.Common.Enums.Organization;
+// <copyright file="Organization.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Entities
 {
+    using MeetlyOmni.Api.Common.Enums.Organization;
+
     public class Organization
     {
         public Guid OrgId { get; set; }
@@ -11,7 +15,9 @@ namespace MeetlyOmni.Api.Data.Entities
         public string OrganizationName { get; set; } = string.Empty;
 
         public string? LogoUrl { get; set; }
+
         public string? CoverImageUrl { get; set; }
+
         public string? Description { get; set; }
 
         public string? Location { get; set; }
@@ -32,9 +38,13 @@ namespace MeetlyOmni.Api.Data.Entities
 
         // Navigation
         public ICollection<Member> Members { get; set; } = new List<Member>();
+
         public ICollection<Event> Events { get; set; } = new List<Event>();
+
         public ICollection<RaffleTicket> RaffleTickets { get; set; } = new List<RaffleTicket>();
+
         public ICollection<MemberActivityLog> ActivityLogs { get; set; } = new List<MemberActivityLog>();
+
         public ICollection<GameRecord> GameRecords { get; set; } = new List<GameRecord>();
     }
 }

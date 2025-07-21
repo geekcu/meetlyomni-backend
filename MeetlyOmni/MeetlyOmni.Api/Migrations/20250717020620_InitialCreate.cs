@@ -1,11 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Migrations;
+// <copyright file="20250717020620_InitialCreate.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 #nullable disable
 
 namespace MeetlyOmni.Api.Migrations
 {
+    using System;
+    using System.Collections.Generic;
+
+    using Microsoft.EntityFrameworkCore.Migrations;
+
     /// <inheritdoc />
     public partial class InitialCreate : Migration
     {
@@ -29,7 +34,7 @@ namespace MeetlyOmni.Api.Migrations
                     IsVerified = table.Column<bool>(type: "boolean", nullable: false),
                     PlanType = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false, defaultValue: "Free"),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -53,7 +58,7 @@ namespace MeetlyOmni.Api.Migrations
                     Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false, defaultValue: "Active"),
                     LastLogin = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -75,7 +80,7 @@ namespace MeetlyOmni.Api.Migrations
                     OrgId = table.Column<Guid>(type: "uuid", nullable: false),
                     EventType = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
                     EventDetail = table.Column<string>(type: "jsonb", nullable: true),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -103,7 +108,7 @@ namespace MeetlyOmni.Api.Migrations
                     MemberId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     IssuedBy = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     Status = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
-                    IssueTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    IssueTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                 },
                 constraints: table =>
                 {

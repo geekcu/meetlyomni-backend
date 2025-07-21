@@ -1,11 +1,16 @@
-﻿using MeetlyOmni.Api.Common.Enums.EventContentBlock;
-using MeetlyOmni.Api.Data.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MeetlyOmni.Api.Common.Extensions;
+// <copyright file="EventContentBlockConfiguration.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Configurations
 {
+    using MeetlyOmni.Api.Common.Enums.EventContentBlock;
+    using MeetlyOmni.Api.Common.Extensions;
+    using MeetlyOmni.Api.Data.Entities;
+
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
     public class EventContentBlockConfiguration : IEntityTypeConfiguration<EventContentBlock>
     {
         public void Configure(EntityTypeBuilder<EventContentBlock> builder)
@@ -16,8 +21,7 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.ConfigureEnumAsString<BlockType>(
                 nameof(EventContentBlock.BlockType),
                 maxLength: 30,
-                isRequired: true
-            );
+                isRequired: true);
 
             builder.ConfigureString(nameof(EventContentBlock.Title), maxLength: 255, isRequired: false);
 

@@ -1,12 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Nodes;
-using Microsoft.EntityFrameworkCore.Migrations;
+// <copyright file="20250718043555_Add 6 more entities.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 #nullable disable
 
 namespace MeetlyOmni.Api.Migrations
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text.Json.Nodes;
+
+    using Microsoft.EntityFrameworkCore.Migrations;
+
     /// <inheritdoc />
     public partial class Add6moreentities : Migration
     {
@@ -169,7 +174,7 @@ namespace MeetlyOmni.Api.Migrations
                     Location = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Language = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
                     Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false, defaultValue: "Draft"),
-                    OrganizationOrgId = table.Column<Guid>(type: "uuid", nullable: true)
+                    OrganizationOrgId = table.Column<Guid>(type: "uuid", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -190,7 +195,7 @@ namespace MeetlyOmni.Api.Migrations
                     Title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Config = table.Column<JsonObject>(type: "jsonb", nullable: true),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: true),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
                 },
                 constraints: table =>
                 {
@@ -207,7 +212,7 @@ namespace MeetlyOmni.Api.Migrations
                     Title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Content = table.Column<JsonObject>(type: "jsonb", nullable: true),
                     OrderNum = table.Column<int>(type: "integer", nullable: true),
-                    Visible = table.Column<bool>(type: "boolean", nullable: true)
+                    Visible = table.Column<bool>(type: "boolean", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -232,7 +237,7 @@ namespace MeetlyOmni.Api.Migrations
                     Company = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Position = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     SocialLinks = table.Column<JsonObject>(type: "jsonb", nullable: true),
-                    Order = table.Column<int>(type: "integer", nullable: false)
+                    Order = table.Column<int>(type: "integer", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -256,7 +261,7 @@ namespace MeetlyOmni.Api.Migrations
                     Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false, defaultValue: "Draft"),
                     OrderNum = table.Column<int>(type: "integer", nullable: true),
                     StartTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    EndTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    EndTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -285,7 +290,7 @@ namespace MeetlyOmni.Api.Migrations
                     OrgId = table.Column<Guid>(type: "uuid", nullable: false),
                     ResponseData = table.Column<JsonObject>(type: "jsonb", nullable: true),
                     Score = table.Column<int>(type: "integer", nullable: true),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
                 },
                 constraints: table =>
                 {

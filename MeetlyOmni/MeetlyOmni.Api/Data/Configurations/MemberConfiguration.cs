@@ -1,11 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MeetlyOmni.Api.Common.Enums.Members;
-using MeetlyOmni.Api.Common.Extensions;
-using MeetlyOmni.Api.Data.Entities;
+// <copyright file="MemberConfiguration.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Configurations
 {
+    using MeetlyOmni.Api.Common.Enums.Members;
+    using MeetlyOmni.Api.Common.Extensions;
+    using MeetlyOmni.Api.Data.Entities;
+
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
     public class MemberConfiguration : IEntityTypeConfiguration<Member>
     {
         public void Configure(EntityTypeBuilder<Member> builder)
@@ -32,8 +37,7 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.ConfigureEnumAsString<MemberStatus>(
                 nameof(Member.Status),
                 maxLength: 20,
-                defaultValue: MemberStatus.Active
-            );
+                defaultValue: MemberStatus.Active);
 
             builder.Property(m => m.CreatedAt)
                    .HasDefaultValueSql("NOW()");

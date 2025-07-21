@@ -1,8 +1,13 @@
-﻿using MeetlyOmni.Api.Common.Enums.Game;
-using System.Text.Json.Nodes;
+// <copyright file="Game.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Entities
 {
+    using System.Text.Json.Nodes;
+
+    using MeetlyOmni.Api.Common.Enums.Game;
+
     public class Game
     {
         public Guid GameId { get; set; }

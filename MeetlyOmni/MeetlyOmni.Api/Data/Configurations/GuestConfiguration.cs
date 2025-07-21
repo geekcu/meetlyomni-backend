@@ -1,10 +1,15 @@
-﻿using MeetlyOmni.Api.Data.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MeetlyOmni.Api.Common.Extensions;
+// <copyright file="GuestConfiguration.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Configurations
 {
+    using MeetlyOmni.Api.Common.Extensions;
+    using MeetlyOmni.Api.Data.Entities;
+
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
     public class GuestConfiguration : IEntityTypeConfiguration<Guest>
     {
         public void Configure(EntityTypeBuilder<Guest> builder)

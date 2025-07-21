@@ -1,7 +1,11 @@
-﻿using System.Text.Json.Nodes;
+// <copyright file="Guest.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Entities
 {
+    using System.Text.Json.Nodes;
+
     public class Guest
     {
         public Guid GuestId { get; set; }

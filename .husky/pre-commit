@@ -1,0 +1,11 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running dotnet format..."
+dotnet format MeetlyOmni/MeetlyOmni.sln || exit 1
+
+echo "🔨 Building solution..."
+dotnet build MeetlyOmni/MeetlyOmni.sln --no-restore || exit 1
+
+echo "🧪 Running tests..."
+dotnet test MeetlyOmni/MeetlyOmni.sln --no-build || exit 1

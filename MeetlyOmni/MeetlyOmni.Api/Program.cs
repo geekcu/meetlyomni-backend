@@ -1,3 +1,7 @@
+// <copyright file="Program.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 using MeetlyOmni.Api.Data;
 using MeetlyOmni.Api.Mapping;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
-
 
 var connectionString = builder.Configuration.GetConnectionString("MeetlyOmniDb");
 
@@ -24,7 +27,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Health Check
 builder.Services.AddHealthChecks()
     .AddNpgSql(connectionString);
-
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

@@ -1,7 +1,11 @@
-﻿using MeetlyOmni.Api.Common.Enums.Members;
+// <copyright file="Member.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Entities
 {
+    using MeetlyOmni.Api.Common.Enums.Members;
+
     public class Member
     {
         public string MemberId { get; set; } = string.Empty;
@@ -20,7 +24,7 @@ namespace MeetlyOmni.Api.Data.Entities
 
         public string LanguagePref { get; set; } = "en";
 
-        public List<string> Tags { get; set; } = new();
+        public List<string> Tags { get; set; } = new ();
 
         public int Points { get; set; } = 0;
 
@@ -34,8 +38,11 @@ namespace MeetlyOmni.Api.Data.Entities
 
         // Navigation
         public Organization? Organization { get; set; }
+
         public ICollection<MemberActivityLog> ActivityLogs { get; set; } = new List<MemberActivityLog>();
+
         public ICollection<RaffleTicket> RaffleTickets { get; set; } = new List<RaffleTicket>();
+
         public ICollection<GameRecord> GameRecords { get; set; } = new List<GameRecord>();
     }
 }

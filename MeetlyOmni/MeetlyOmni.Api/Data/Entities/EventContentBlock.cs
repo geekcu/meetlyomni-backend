@@ -1,8 +1,13 @@
-﻿using MeetlyOmni.Api.Common.Enums.EventContentBlock;
-using System.Text.Json.Nodes;
+// <copyright file="EventContentBlock.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Entities
 {
+    using System.Text.Json.Nodes;
+
+    using MeetlyOmni.Api.Common.Enums.EventContentBlock;
+
     public class EventContentBlock
     {
         public Guid BlockId { get; set; }

@@ -1,11 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MeetlyOmni.Api.Common.Enums.Organization;
-using MeetlyOmni.Api.Common.Extensions;
-using MeetlyOmni.Api.Data.Entities;
+// <copyright file="OrganizationConfiguration.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Configurations
 {
+    using MeetlyOmni.Api.Common.Enums.Organization;
+    using MeetlyOmni.Api.Common.Extensions;
+    using MeetlyOmni.Api.Data.Entities;
+
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
     public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
     {
         public void Configure(EntityTypeBuilder<Organization> builder)
@@ -31,8 +36,7 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.ConfigureEnumAsString<PlanType>(
                 nameof(Organization.PlanType),
                 maxLength: 20,
-                defaultValue: PlanType.Free
-            );
+                defaultValue: PlanType.Free);
 
             builder.Property(o => o.CreatedAt)
                    .HasDefaultValueSql("NOW()");

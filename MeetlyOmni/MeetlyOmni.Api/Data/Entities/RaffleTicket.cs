@@ -1,7 +1,11 @@
-﻿using MeetlyOmni.Api.Common.Enums.RaffleTicket;
+// <copyright file="RaffleTicket.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Entities
 {
+    using MeetlyOmni.Api.Common.Enums.RaffleTicket;
+
     public class RaffleTicket
     {
         public Guid TicketId { get; set; }
@@ -18,6 +22,7 @@ namespace MeetlyOmni.Api.Data.Entities
 
         // Navigation
         public Member? Member { get; set; }
+
         public Organization? Organization { get; set; }
     }
 }

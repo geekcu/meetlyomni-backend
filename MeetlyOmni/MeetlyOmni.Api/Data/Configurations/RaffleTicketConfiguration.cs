@@ -1,11 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MeetlyOmni.Api.Common.Enums.RaffleTicket;
-using MeetlyOmni.Api.Common.Extensions;
-using MeetlyOmni.Api.Data.Entities;
+// <copyright file="RaffleTicketConfiguration.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Configurations
 {
+    using MeetlyOmni.Api.Common.Enums.RaffleTicket;
+    using MeetlyOmni.Api.Common.Extensions;
+    using MeetlyOmni.Api.Data.Entities;
+
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
     public class RaffleTicketConfiguration : IEntityTypeConfiguration<RaffleTicket>
     {
         public void Configure(EntityTypeBuilder<RaffleTicket> builder)
@@ -25,13 +30,11 @@ namespace MeetlyOmni.Api.Data.Configurations
                 nameof(RaffleTicket.Status),
                 maxLength: 20,
                 columnType: "varchar(20)",
-                defaultValue: RaffleTicketStatus.Unused
-            );
+                defaultValue: RaffleTicketStatus.Unused);
 
             builder.ConfigureNullableEnumAsString<RaffleIssuedSource>(
                 nameof(RaffleTicket.IssuedBy),
-                maxLength: 20
-            );
+                maxLength: 20);
 
             builder.HasOne(r => r.Member)
                    .WithMany(m => m.RaffleTickets)

@@ -1,11 +1,16 @@
-﻿using MeetlyOmni.Api.Common.Enums.Game;
-using MeetlyOmni.Api.Common.Extensions;
-using MeetlyOmni.Api.Data.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+// <copyright file="GameConfiguration.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Configurations
 {
+    using MeetlyOmni.Api.Common.Enums.Game;
+    using MeetlyOmni.Api.Common.Extensions;
+    using MeetlyOmni.Api.Data.Entities;
+
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
     public class GameConfiguration : IEntityTypeConfiguration<Game>
     {
         public void Configure(EntityTypeBuilder<Game> builder)
@@ -14,8 +19,7 @@ namespace MeetlyOmni.Api.Data.Configurations
 
             builder.ConfigureEnumAsString<GameType>(
                 nameof(Game.Type),
-                maxLength: 30
-            );
+                maxLength: 30);
 
             builder.ConfigureString(nameof(Game.Title), maxLength: 255, isRequired: false);
 

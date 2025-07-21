@@ -1,11 +1,16 @@
-﻿using MeetlyOmni.Api.Common.Enums.EventGameInstance;
-using MeetlyOmni.Api.Common.Extensions;
-using MeetlyOmni.Api.Data.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+// <copyright file="EventGameInstanceConfiguration.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Configurations
 {
+    using MeetlyOmni.Api.Common.Enums.EventGameInstance;
+    using MeetlyOmni.Api.Common.Extensions;
+    using MeetlyOmni.Api.Data.Entities;
+
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
     public class EventGameInstanceConfiguration : IEntityTypeConfiguration<EventGameInstance>
     {
         public void Configure(EntityTypeBuilder<EventGameInstance> builder)
@@ -20,8 +25,7 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.ConfigureEnumAsString<InstanceStatus>(
                 nameof(EventGameInstance.Status),
                 maxLength: 20,
-                defaultValue: InstanceStatus.Draft
-            );
+                defaultValue: InstanceStatus.Draft);
 
             // Relationships
             builder.HasOne(x => x.Event)
