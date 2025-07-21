@@ -1,5 +1,5 @@
-// <copyright file="MemberActivityLog.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
+// <copyright file="MemberActivityLog.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
 namespace MeetlyOmni.Api.Data.Entities

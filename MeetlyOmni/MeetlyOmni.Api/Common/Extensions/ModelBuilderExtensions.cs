@@ -1,5 +1,5 @@
-// <copyright file="ModelBuilderExtensions.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
+// <copyright file="ModelBuilderExtensions.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
 namespace MeetlyOmni.Api.Common.Extensions
@@ -15,7 +15,7 @@ namespace MeetlyOmni.Api.Common.Extensions
         /// <summary>
         /// Configure non-nullable enum as string with optional default, type, and required.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The property builder for the configured enum property.</returns>
         public static PropertyBuilder<TEnum> ConfigureEnumAsString<TEnum>(
             this EntityTypeBuilder builder,
             string propertyName,
@@ -57,7 +57,7 @@ namespace MeetlyOmni.Api.Common.Extensions
         /// <summary>
         /// Configure enum as string with optional default, type, and not required.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The property builder for the configured nullable enum property.</returns>
         public static PropertyBuilder<TEnum?> ConfigureNullableEnumAsString<TEnum>(
             this EntityTypeBuilder builder,
             string propertyName,
@@ -101,7 +101,7 @@ namespace MeetlyOmni.Api.Common.Extensions
         /// <summary>
         /// Configure property as JSONB JsonObject.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The property builder for the configured JsonObject property.</returns>
         public static PropertyBuilder<JsonObject> ConfigureJsonbObject(
             this EntityTypeBuilder builder,
             string propertyName)
@@ -114,7 +114,7 @@ namespace MeetlyOmni.Api.Common.Extensions
         /// <summary>
         /// Configure string with max length and required option.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The property builder for the configured string property.</returns>
         public static PropertyBuilder<string> ConfigureString(
             this EntityTypeBuilder builder,
             string propertyName,
@@ -125,10 +125,10 @@ namespace MeetlyOmni.Api.Common.Extensions
             return isRequired ? prop.IsRequired() : prop.IsRequired(false);
         }
 
-        ///
-        /// <returns></returns><summary>
-        /// Configure List.<string> as jsonb list (Postgres).
+        /// <summary>
+        /// Configure List&lt;string&gt; as jsonb list (Postgres).
         /// </summary>
+        /// <returns>The property builder for the configured list property.</returns>
         public static PropertyBuilder<List<string>> ConfigureJsonbList(
             this EntityTypeBuilder builder,
             string propertyName)
@@ -141,7 +141,7 @@ namespace MeetlyOmni.Api.Common.Extensions
         /// <summary>
         /// Configure raw json string as jsonb column.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The property builder for the configured jsonb string property.</returns>
         public static PropertyBuilder<string> ConfigureJsonbText(
             this EntityTypeBuilder builder,
             string propertyName)

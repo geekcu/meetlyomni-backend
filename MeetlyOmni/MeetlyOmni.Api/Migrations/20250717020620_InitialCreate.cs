@@ -1,5 +1,5 @@
-// <copyright file="20250717020620_InitialCreate.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
+// <copyright file="20250717020620_InitialCreate.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
 #nullable disable

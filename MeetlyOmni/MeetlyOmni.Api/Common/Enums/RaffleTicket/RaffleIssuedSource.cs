@@ -1,5 +1,5 @@
-// <copyright file="RaffleIssuedSource.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
+// <copyright file="RaffleIssuedSource.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
 namespace MeetlyOmni.Api.Common.Enums.RaffleTicket

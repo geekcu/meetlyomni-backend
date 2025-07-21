@@ -1,5 +1,5 @@
-// <copyright file="EventStatus.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
+// <copyright file="EventStatus.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
 namespace MeetlyOmni.Api.Common.Enums.Event
