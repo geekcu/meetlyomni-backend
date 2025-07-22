@@ -6,6 +6,7 @@ namespace MeetlyOmni.Api.Common.Extensions
 {
     using System.Linq.Expressions;
     using System.Text.Json.Nodes;
+
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -15,6 +16,7 @@ namespace MeetlyOmni.Api.Common.Extensions
         /// <summary>
         /// Configure non-nullable enum as string with optional default, type, and required.
         /// </summary>
+        /// <returns></returns>
         public static PropertyBuilder<TEnum> ConfigureEnumAsString<TEntity, TEnum>(
             this EntityTypeBuilder<TEntity> builder,
             Expression<Func<TEntity, TEnum>> propertyExpression,
@@ -36,6 +38,7 @@ namespace MeetlyOmni.Api.Common.Extensions
         /// <summary>
         /// Configure nullable enum as string with optional default, type, and required.
         /// </summary>
+        /// <returns></returns>
         public static PropertyBuilder<TEnum?> ConfigureNullableEnumAsString<TEntity, TEnum>(
             this EntityTypeBuilder<TEntity> builder,
             Expression<Func<TEntity, TEnum?>> propertyExpression,
@@ -47,7 +50,7 @@ namespace MeetlyOmni.Api.Common.Extensions
             where TEnum : struct, Enum
         {
             var converter = new ValueConverter<TEnum?, string>(
-                v => v.HasValue ? v.Value.ToString()! : null!,
+                v => v.HasValue ? v.Value.ToString() ! : null!,
                 v => string.IsNullOrEmpty(v) ? (TEnum?)null : Enum.Parse<TEnum>(v));
 
             var property = builder
@@ -60,6 +63,7 @@ namespace MeetlyOmni.Api.Common.Extensions
         /// <summary>
         /// Configure JsonObject property as jsonb.
         /// </summary>
+        /// <returns></returns>
         public static PropertyBuilder<JsonObject> ConfigureJsonbObject<TEntity>(
             this EntityTypeBuilder<TEntity> builder,
             Expression<Func<TEntity, JsonObject>> propertyExpression)
@@ -73,6 +77,7 @@ namespace MeetlyOmni.Api.Common.Extensions
         /// <summary>
         /// Configure string with max length and required option.
         /// </summary>
+        /// <returns></returns>
         public static PropertyBuilder<string> ConfigureString<TEntity>(
             this EntityTypeBuilder<TEntity> builder,
             Expression<Func<TEntity, string>> propertyExpression,
@@ -87,6 +92,7 @@ namespace MeetlyOmni.Api.Common.Extensions
         /// <summary>
         /// Configure List&lt;string&gt; as jsonb with default empty array.
         /// </summary>
+        /// <returns></returns>
         public static PropertyBuilder<List<string>> ConfigureJsonbList<TEntity>(
             this EntityTypeBuilder<TEntity> builder,
             Expression<Func<TEntity, List<string>>> propertyExpression)
@@ -101,6 +107,7 @@ namespace MeetlyOmni.Api.Common.Extensions
         /// <summary>
         /// Configure raw JSON string as jsonb column.
         /// </summary>
+        /// <returns></returns>
         public static PropertyBuilder<string> ConfigureJsonbText<TEntity>(
             this EntityTypeBuilder<TEntity> builder,
             Expression<Func<TEntity, string>> propertyExpression)
