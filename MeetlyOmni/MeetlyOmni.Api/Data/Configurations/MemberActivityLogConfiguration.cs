@@ -24,12 +24,12 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.Property(x => x.OrgId)
                    .IsRequired();
 
-            builder.ConfigureEnumAsString<MemberEventType>(
-                nameof(MemberActivityLog.EventType),
+            builder.ConfigureEnumAsString(
+                x => x.EventType,
                 maxLength: 50,
                 columnType: "varchar(50)");
 
-            builder.ConfigureJsonbObject(nameof(MemberActivityLog.EventDetail));
+            builder.ConfigureJsonbObject(x => x.EventDetail);
 
             builder.Property(x => x.CreatedAt)
                    .HasDefaultValueSql("NOW()");

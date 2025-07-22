@@ -17,15 +17,15 @@ namespace MeetlyOmni.Api.Data.Configurations
         {
             builder.HasKey(o => o.OrgId);
 
-            builder.ConfigureString(nameof(Organization.OrganizationCode), maxLength: 30);
-            builder.ConfigureString(nameof(Organization.OrganizationName), maxLength: 100);
-            builder.ConfigureString(nameof(Organization.LogoUrl), isRequired: false);
-            builder.ConfigureString(nameof(Organization.CoverImageUrl), isRequired: false);
-            builder.ConfigureString(nameof(Organization.Description), isRequired: false);
-            builder.ConfigureString(nameof(Organization.Location), maxLength: 255, isRequired: false);
-            builder.ConfigureString(nameof(Organization.WebsiteUrl), isRequired: false);
+            builder.ConfigureString(o => o.OrganizationCode, maxLength: 30);
+            builder.ConfigureString(o => o.OrganizationName, maxLength: 100);
+            builder.ConfigureString(o => o.LogoUrl, isRequired: false);
+            builder.ConfigureString(o => o.CoverImageUrl, isRequired: false);
+            builder.ConfigureString(o => o.Description, isRequired: false);
+            builder.ConfigureString(o => o.Location, maxLength: 255, isRequired: false);
+            builder.ConfigureString(o => o.WebsiteUrl, isRequired: false);
 
-            builder.ConfigureJsonbList(nameof(Organization.IndustryTags));
+            builder.ConfigureJsonbList(o => o.IndustryTags);
 
             builder.Property(o => o.FollowerCount)
                    .HasDefaultValue(0);
@@ -33,8 +33,8 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.Property(o => o.IsVerified)
                    .HasDefaultValue(false);
 
-            builder.ConfigureEnumAsString<PlanType>(
-                nameof(Organization.PlanType),
+            builder.ConfigureEnumAsString(
+                o => o.PlanType,
                 maxLength: 20,
                 defaultValue: PlanType.Free);
 

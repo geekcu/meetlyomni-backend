@@ -1,4 +1,4 @@
-// <copyright file="EventConfiguration.cs" company="MeetlyOmni">
+﻿// <copyright file="EventConfiguration.cs" company="MeetlyOmni">
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
@@ -17,12 +17,12 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
 
         builder.Property(e => e.OrgId).IsRequired();
 
-        builder.ConfigureString(nameof(Event.Title), maxLength: 255, isRequired: false);
-        builder.ConfigureString(nameof(Event.Location), maxLength: 255, isRequired: false);
-        builder.ConfigureString(nameof(Event.Language), maxLength: 10, isRequired: false);
+        builder.ConfigureString(e => e.Title, maxLength: 255, isRequired: false);
+        builder.ConfigureString(e => e.Location, maxLength: 255, isRequired: false);
+        builder.ConfigureString(e => e.Language, maxLength: 10, isRequired: false);
 
-        builder.ConfigureEnumAsString<EventStatus>(
-            nameof(Event.Status),
+        builder.ConfigureEnumAsString(
+            e => e.Status,
             maxLength: 20,
             defaultValue: EventStatus.Draft);
     }

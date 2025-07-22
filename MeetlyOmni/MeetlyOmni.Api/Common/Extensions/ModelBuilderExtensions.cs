@@ -4,8 +4,8 @@
 
 namespace MeetlyOmni.Api.Common.Extensions
 {
+    using System.Linq.Expressions;
     using System.Text.Json.Nodes;
-
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -15,139 +15,125 @@ namespace MeetlyOmni.Api.Common.Extensions
         /// <summary>
         /// Configure non-nullable enum as string with optional default, type, and required.
         /// </summary>
-        /// <returns>The property builder for the configured enum property.</returns>
-        public static PropertyBuilder<TEnum> ConfigureEnumAsString<TEnum>(
-            this EntityTypeBuilder builder,
-            string propertyName,
+        public static PropertyBuilder<TEnum> ConfigureEnumAsString<TEntity, TEnum>(
+            this EntityTypeBuilder<TEntity> builder,
+            Expression<Func<TEntity, TEnum>> propertyExpression,
             int maxLength = 30,
             string? columnType = null,
             TEnum? defaultValue = null,
             bool isRequired = true)
+            where TEntity : class
             where TEnum : struct, Enum
         {
             var converter = new EnumToStringConverter<TEnum>();
-
             var property = builder
-                .Property<TEnum>(propertyName)
-                .HasConversion(converter)
-                .HasMaxLength(maxLength);
+                .Property(propertyExpression)
+                .HasConversion(converter);
 
-            if (!string.IsNullOrEmpty(columnType))
-            {
-                property.HasColumnType(columnType);
-            }
-
-            if (defaultValue is not null)
-            {
-                property.HasDefaultValue(defaultValue.Value);
-            }
-
-            if (isRequired)
-            {
-                property.IsRequired();
-            }
-            else
-            {
-                property.IsRequired(false);
-            }
-
-            return property;
+            return ApplyEnumPropertySettings(property, maxLength, columnType, defaultValue, isRequired);
         }
 
         /// <summary>
-        /// Configure enum as string with optional default, type, and not required.
+        /// Configure nullable enum as string with optional default, type, and required.
         /// </summary>
-        /// <returns>The property builder for the configured nullable enum property.</returns>
-        public static PropertyBuilder<TEnum?> ConfigureNullableEnumAsString<TEnum>(
-            this EntityTypeBuilder builder,
-            string propertyName,
+        public static PropertyBuilder<TEnum?> ConfigureNullableEnumAsString<TEntity, TEnum>(
+            this EntityTypeBuilder<TEntity> builder,
+            Expression<Func<TEntity, TEnum?>> propertyExpression,
             int maxLength = 30,
             string? columnType = null,
             TEnum? defaultValue = null,
             bool isRequired = false)
+            where TEntity : class
             where TEnum : struct, Enum
         {
             var converter = new ValueConverter<TEnum?, string>(
-                v => v.HasValue ? v.Value.ToString() ! : null!,
+                v => v.HasValue ? v.Value.ToString()! : null!,
                 v => string.IsNullOrEmpty(v) ? (TEnum?)null : Enum.Parse<TEnum>(v));
 
             var property = builder
-                .Property<TEnum?>(propertyName)
-                .HasConversion(converter)
-                .HasMaxLength(maxLength);
+                .Property(propertyExpression)
+                .HasConversion(converter);
 
-            if (!string.IsNullOrEmpty(columnType))
-            {
-                property.HasColumnType(columnType);
-            }
-
-            if (defaultValue is not null)
-            {
-                property.HasDefaultValue(defaultValue.Value);
-            }
-
-            if (isRequired)
-            {
-                property.IsRequired();
-            }
-            else
-            {
-                property.IsRequired(false);
-            }
-
-            return property;
+            return ApplyEnumPropertySettings(property, maxLength, columnType, defaultValue, isRequired);
         }
 
         /// <summary>
-        /// Configure property as JSONB JsonObject.
+        /// Configure JsonObject property as jsonb.
         /// </summary>
-        /// <returns>The property builder for the configured JsonObject property.</returns>
-        public static PropertyBuilder<JsonObject> ConfigureJsonbObject(
-            this EntityTypeBuilder builder,
-            string propertyName)
+        public static PropertyBuilder<JsonObject> ConfigureJsonbObject<TEntity>(
+            this EntityTypeBuilder<TEntity> builder,
+            Expression<Func<TEntity, JsonObject>> propertyExpression)
+            where TEntity : class
         {
             return builder
-                .Property<JsonObject>(propertyName)
+                .Property(propertyExpression)
                 .HasColumnType("jsonb");
         }
 
         /// <summary>
         /// Configure string with max length and required option.
         /// </summary>
-        /// <returns>The property builder for the configured string property.</returns>
-        public static PropertyBuilder<string> ConfigureString(
-            this EntityTypeBuilder builder,
-            string propertyName,
+        public static PropertyBuilder<string> ConfigureString<TEntity>(
+            this EntityTypeBuilder<TEntity> builder,
+            Expression<Func<TEntity, string>> propertyExpression,
             int maxLength = 255,
             bool isRequired = true)
+            where TEntity : class
         {
-            var prop = builder.Property<string>(propertyName).HasMaxLength(maxLength);
+            var prop = builder.Property(propertyExpression).HasMaxLength(maxLength);
             return isRequired ? prop.IsRequired() : prop.IsRequired(false);
         }
 
         /// <summary>
-        /// Configure List&lt;string&gt; as jsonb list (Postgres).
+        /// Configure List&lt;string&gt; as jsonb with default empty array.
         /// </summary>
-        /// <returns>The property builder for the configured list property.</returns>
-        public static PropertyBuilder<List<string>> ConfigureJsonbList(
-            this EntityTypeBuilder builder,
-            string propertyName)
+        public static PropertyBuilder<List<string>> ConfigureJsonbList<TEntity>(
+            this EntityTypeBuilder<TEntity> builder,
+            Expression<Func<TEntity, List<string>>> propertyExpression)
+            where TEntity : class
         {
-            return builder.Property<List<string>>(propertyName)
-                         .HasColumnType("jsonb")
-                         .HasDefaultValueSql("'[]'::jsonb");
+            return builder
+                .Property(propertyExpression)
+                .HasColumnType("jsonb")
+                .HasDefaultValueSql("'[]'::jsonb");
         }
 
         /// <summary>
-        /// Configure raw json string as jsonb column.
+        /// Configure raw JSON string as jsonb column.
         /// </summary>
-        /// <returns>The property builder for the configured jsonb string property.</returns>
-        public static PropertyBuilder<string> ConfigureJsonbText(
-            this EntityTypeBuilder builder,
-            string propertyName)
+        public static PropertyBuilder<string> ConfigureJsonbText<TEntity>(
+            this EntityTypeBuilder<TEntity> builder,
+            Expression<Func<TEntity, string>> propertyExpression)
+            where TEntity : class
         {
-            return builder.Property<string>(propertyName)
-                         .HasColumnType("jsonb");
+            return builder
+                .Property(propertyExpression)
+                .HasColumnType("jsonb");
+        }
+
+        /// <summary>
+        /// Shared logic for configuring enum/string/jsonb properties.
+        /// </summary>
+        private static PropertyBuilder<TProperty> ApplyEnumPropertySettings<TProperty>(
+            PropertyBuilder<TProperty> property,
+            int maxLength,
+            string? columnType,
+            object? defaultValue,
+            bool isRequired)
+        {
+            property.HasMaxLength(maxLength);
+
+            if (!string.IsNullOrEmpty(columnType))
+            {
+                property.HasColumnType(columnType);
+            }
+
+            if (defaultValue is not null)
+            {
+                property.HasDefaultValue(defaultValue);
+            }
+
+            return isRequired ? property.IsRequired() : property.IsRequired(false);
         }
     }
 }

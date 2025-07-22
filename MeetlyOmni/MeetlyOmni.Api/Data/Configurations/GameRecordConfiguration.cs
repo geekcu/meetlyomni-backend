@@ -19,8 +19,8 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.Property(r => r.OrgId).IsRequired();
             builder.Property(r => r.MemberId).IsRequired();
 
-            builder.ConfigureString(nameof(GameRecord.MemberId), maxLength: 50);
-            builder.ConfigureJsonbObject(nameof(GameRecord.ResponseData));
+            builder.ConfigureString(r => r.MemberId, maxLength: 50);
+            builder.ConfigureJsonbObject(r => r.ResponseData);
 
             builder.Property(r => r.CreatedAt)
                    .HasDefaultValueSql("NOW()");

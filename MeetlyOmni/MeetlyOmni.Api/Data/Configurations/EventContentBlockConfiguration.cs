@@ -1,4 +1,4 @@
-// <copyright file="EventContentBlockConfiguration.cs" company="MeetlyOmni">
+﻿// <copyright file="EventContentBlockConfiguration.cs" company="MeetlyOmni">
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
@@ -18,14 +18,14 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.HasKey(b => b.BlockId);
             builder.Property(b => b.EventId).IsRequired();
 
-            builder.ConfigureEnumAsString<BlockType>(
-                nameof(EventContentBlock.BlockType),
+            builder.ConfigureEnumAsString(
+                b => b.BlockType,
                 maxLength: 30,
                 isRequired: true);
 
-            builder.ConfigureString(nameof(EventContentBlock.Title), maxLength: 255, isRequired: false);
+            builder.ConfigureString(b => b.Title, maxLength: 255, isRequired: false);
 
-            builder.ConfigureJsonbObject(nameof(EventContentBlock.Content));
+            builder.ConfigureJsonbObject(b => b.Content);
         }
     }
 }

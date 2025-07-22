@@ -17,13 +17,13 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.HasKey(g => g.GuestId);
             builder.Property(g => g.EventId).IsRequired();
 
-            builder.ConfigureString(nameof(Guest.Name), maxLength: 255);
-            builder.ConfigureString(nameof(Guest.Company), maxLength: 255, isRequired: false);
-            builder.ConfigureString(nameof(Guest.Position), maxLength: 255, isRequired: false);
-            builder.ConfigureString(nameof(Guest.AvatarUrl), isRequired: false);
-            builder.ConfigureString(nameof(Guest.Bio), isRequired: false);
+            builder.ConfigureString(g => g.Name, maxLength: 255);
+            builder.ConfigureString(g => g.Company, maxLength: 255, isRequired: false);
+            builder.ConfigureString(g => g.Position, maxLength: 255, isRequired: false);
+            builder.ConfigureString(g => g.AvatarUrl, isRequired: false);
+            builder.ConfigureString(g => g.Bio, isRequired: false);
 
-            builder.ConfigureJsonbObject(nameof(Guest.SocialLinks));
+            builder.ConfigureJsonbObject(g => g.SocialLinks);
 
             builder.Property(g => g.Order)
                    .IsRequired(); // 可选加默认值：.HasDefaultValue(0)

@@ -26,14 +26,14 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.Property(x => x.IssueTime)
                    .HasDefaultValueSql("NOW()");
 
-            builder.ConfigureEnumAsString<RaffleTicketStatus>(
-                nameof(RaffleTicket.Status),
+            builder.ConfigureEnumAsString(
+                x => x.Status,
                 maxLength: 20,
                 columnType: "varchar(20)",
                 defaultValue: RaffleTicketStatus.Unused);
 
-            builder.ConfigureNullableEnumAsString<RaffleIssuedSource>(
-                nameof(RaffleTicket.IssuedBy),
+            builder.ConfigureNullableEnumAsString(
+                x => x.IssuedBy,
                 maxLength: 20);
 
             builder.HasOne(r => r.Member)

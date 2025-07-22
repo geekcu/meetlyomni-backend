@@ -17,13 +17,13 @@ namespace MeetlyOmni.Api.Data.Configurations
         {
             builder.HasKey(g => g.GameId);
 
-            builder.ConfigureEnumAsString<GameType>(
-                nameof(Game.Type),
+            builder.ConfigureEnumAsString(
+                g => g.Type,
                 maxLength: 30);
 
-            builder.ConfigureString(nameof(Game.Title), maxLength: 255, isRequired: false);
+            builder.ConfigureString(g => g.Title, maxLength: 255, isRequired: false);
 
-            builder.ConfigureJsonbObject(nameof(Game.Config));
+            builder.ConfigureJsonbObject(g => g.Config);
 
             builder.Property(g => g.CreatedAt)
                    .HasDefaultValueSql("NOW()");

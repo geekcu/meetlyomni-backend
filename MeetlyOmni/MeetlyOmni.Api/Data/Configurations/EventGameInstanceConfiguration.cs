@@ -20,10 +20,10 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.Property(x => x.EventId).IsRequired();
             builder.Property(x => x.GameId).IsRequired();
 
-            builder.ConfigureString(nameof(EventGameInstance.TitleOverride), maxLength: 255, isRequired: false);
+            builder.ConfigureString(x => x.TitleOverride, maxLength: 255, isRequired: false);
 
-            builder.ConfigureEnumAsString<InstanceStatus>(
-                nameof(EventGameInstance.Status),
+            builder.ConfigureEnumAsString(
+                x => x.Status,
                 maxLength: 20,
                 defaultValue: InstanceStatus.Draft);
 
