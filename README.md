@@ -105,3 +105,42 @@ MeetlyOmni.Backend/
 ├── .gitignore                   # Git ignore rules
 └── README.md                    # Project documentation
 ```
+
+## Docker Compose Usage
+
+### 0. What does this Docker Compose include?
+
+This Docker Compose setup includes the following services:
+- **API Service**: The .NET 8 Web API for Meetly Omni.
+- **Database (PostgreSQL)**: A PostgreSQL database instance.
+- **SQL Query Tool (Adminer)**: A web-based database management tool.
+
+### 1. Benefits of Using Docker Compose
+
+Using Docker Compose to start the API service, database, and Adminer has several advantages over setting them up individually:
+- **Simplified Setup**: Easily start all services with a single command.
+- **Consistency**: Ensures the same environment across different development machines.
+- **Isolation**: Runs each service in its own container, avoiding conflicts.
+
+### 2. How to Use Docker Compose
+
+**Pre-requisite**: Make sure Docker Desktop is installed and running.
+
+To start the services, run the following command in the project root:
+
+```bash
+docker-compose up -d
+```
+
+This command will start all the services in detached mode.
+
+### 3. Accessing Services
+
+- **Adminer**: Once the services are up, you can access Adminer at `http://localhost:8081`. Use the following credentials to connect to the PostgreSQL database:
+  - **System**: PostgreSQL
+  - **Server**: db
+  - **Username**: (your database username)
+  - **Password**: (your database password)
+  - **Database**: (your database name)
+
+- **API Swagger**: The API documentation is available at `http://localhost:5000/swagger`. You can use this interface to explore and test the API endpoints.
