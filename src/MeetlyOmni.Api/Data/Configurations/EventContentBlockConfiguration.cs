@@ -26,6 +26,27 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.ConfigureString(b => b.Title, maxLength: 255, isRequired: false);
 
             builder.ConfigureJsonbObject(b => b.Content);
+
+            builder.Property(b => b.OrderNum)
+                   .HasDefaultValue(0);
+
+            builder.Property(b => b.Visible)
+                   .HasDefaultValue(true);
+
+            // Foreign key relationships
+            builder.HasOne(b => b.Event)
+                   .WithMany(e => e.ContentBlocks)
+                   .HasForeignKey(b => b.EventId);
+
+            // Performance indexes
+            builder.HasIndex(b => new { b.EventId, b.OrderNum })
+                   .HasDatabaseName("IX_EventContentBlock_EventId_OrderNum");
+
+            builder.HasIndex(b => new { b.EventId, b.Visible })
+                   .HasDatabaseName("IX_EventContentBlock_EventId_Visible");
+
+            builder.HasIndex(b => b.BlockType)
+                   .HasDatabaseName("IX_EventContentBlock_BlockType");
         }
     }
 }

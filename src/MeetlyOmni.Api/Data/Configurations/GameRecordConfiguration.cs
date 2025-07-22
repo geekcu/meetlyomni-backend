@@ -36,6 +36,16 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.HasOne(r => r.Member)
                    .WithMany(m => m.GameRecords)
                    .HasForeignKey(r => r.MemberId);
+
+            // Performance indexes
+            builder.HasIndex(r => new { r.InstanceId, r.MemberId })
+                   .HasDatabaseName("IX_GameRecord_InstanceId_MemberId");
+
+            builder.HasIndex(r => new { r.OrgId, r.CreatedAt })
+                   .HasDatabaseName("IX_GameRecord_OrgId_CreatedAt");
+
+            builder.HasIndex(r => r.CreatedAt)
+                   .HasDatabaseName("IX_GameRecord_CreatedAt");
         }
     }
 }

@@ -49,6 +49,26 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.HasOne(m => m.Organization)
                    .WithMany(o => o.Members)
                    .HasForeignKey(m => m.OrgId);
+
+            // Unique constraint - LocalMemberNumber must be unique within the same organization
+            builder.HasIndex(m => new { m.OrgId, m.LocalMemberNumber })
+                   .IsUnique()
+                   .HasDatabaseName("IX_Member_OrgId_LocalMemberNumber");
+
+            // Unique constraint - Email must be unique within the same organization
+            builder.HasIndex(m => new { m.OrgId, m.Email })
+                   .IsUnique()
+                   .HasDatabaseName("IX_Member_OrgId_Email");
+
+            // Performance optimization indexes
+            builder.HasIndex(m => m.Status)
+                   .HasDatabaseName("IX_Member_Status");
+
+            builder.HasIndex(m => m.CreatedAt)
+                   .HasDatabaseName("IX_Member_CreatedAt");
+
+            builder.HasIndex(m => new { m.OrgId, m.Status })
+                   .HasDatabaseName("IX_Member_OrgId_Status");
         }
     }
 }

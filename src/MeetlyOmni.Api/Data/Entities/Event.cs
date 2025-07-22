@@ -28,6 +28,10 @@ namespace MeetlyOmni.Api.Data.Entities
 
         public EventStatus Status { get; set; }
 
+        public DateTimeOffset CreatedAt { get; set; }
+
+        public DateTimeOffset UpdatedAt { get; set; }
+
         // Navigation
         public Organization? Organization { get; set; }
 

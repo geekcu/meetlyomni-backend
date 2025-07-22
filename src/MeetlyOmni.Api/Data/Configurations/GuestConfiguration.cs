@@ -26,7 +26,17 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.ConfigureJsonbObject(g => g.SocialLinks);
 
             builder.Property(g => g.Order)
-                   .IsRequired(); // 可选加默认值：.HasDefaultValue(0)
+                   .IsRequired()
+                   .HasDefaultValue(0);
+
+            // Foreign key relationships
+            builder.HasOne(g => g.Event)
+                   .WithMany(e => e.Guests)
+                   .HasForeignKey(g => g.EventId);
+
+            // Performance indexes
+            builder.HasIndex(g => new { g.EventId, g.Order })
+                   .HasDatabaseName("IX_Guest_EventId_Order");
         }
     }
 }

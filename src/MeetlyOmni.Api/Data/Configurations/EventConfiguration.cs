@@ -25,5 +25,26 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
             e => e.Status,
             maxLength: 20,
             defaultValue: EventStatus.Draft);
+
+        builder.Property(e => e.CreatedAt)
+               .HasDefaultValueSql("NOW()");
+
+        builder.Property(e => e.UpdatedAt)
+               .HasDefaultValueSql("NOW()");
+
+        // Foreign key relationships
+        builder.HasOne(e => e.Organization)
+               .WithMany(o => o.Events)
+               .HasForeignKey(e => e.OrgId);
+
+        // Performance indexes
+        builder.HasIndex(e => e.Status)
+               .HasDatabaseName("IX_Event_Status");
+
+        builder.HasIndex(e => new { e.OrgId, e.Status })
+               .HasDatabaseName("IX_Event_OrgId_Status");
+
+        builder.HasIndex(e => e.StartTime)
+               .HasDatabaseName("IX_Event_StartTime");
     }
 }

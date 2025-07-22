@@ -27,6 +27,19 @@ namespace MeetlyOmni.Api.Data.Configurations
 
             builder.Property(g => g.CreatedAt)
                    .HasDefaultValueSql("NOW()");
+
+            // Foreign key relationships (CreatedBy可能指向Member或Organization，这里先留空)
+            // TODO: 根据业务需求设置CreatedBy的外键关系
+
+            // Performance indexes
+            builder.HasIndex(g => g.Type)
+                   .HasDatabaseName("IX_Game_Type");
+
+            builder.HasIndex(g => g.CreatedBy)
+                   .HasDatabaseName("IX_Game_CreatedBy");
+
+            builder.HasIndex(g => g.CreatedAt)
+                   .HasDatabaseName("IX_Game_CreatedAt");
         }
     }
 }
