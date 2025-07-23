@@ -1,10 +1,14 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿// <copyright file="20250723041643_MemberUuidMigrationFixed.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
+// </copyright>
 
 #nullable disable
 
 namespace MeetlyOmni.Api.Migrations
 {
+    using System;
+    using Microsoft.EntityFrameworkCore.Migrations;
+
     /// <inheritdoc />
     public partial class MemberUuidMigrationFixed : Migration
     {
@@ -180,7 +184,7 @@ namespace MeetlyOmni.Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             // ⚠️ WARNING: Rollback will result in data loss as UUID to string conversion is not reversible
-            
+
             // Drop foreign key constraints
             migrationBuilder.DropForeignKey(
                 name: "FK_Game_Members_CreatedBy",
@@ -225,7 +229,7 @@ namespace MeetlyOmni.Api.Migrations
                 type: "character varying(50)",
                 maxLength: 50,
                 nullable: false,
-                defaultValue: "");
+                defaultValue: string.Empty);
 
             // Convert foreign key columns back to string - this will result in data loss
             migrationBuilder.Sql(@"
