@@ -41,6 +41,7 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
         builder.HasIndex(e => e.Status)
                .HasDatabaseName("IX_Event_Status");
 
+        // Composite index for OrgId and Status
         builder.HasIndex(e => new { e.OrgId, e.Status })
                .HasDatabaseName("IX_Event_OrgId_Status");
 
