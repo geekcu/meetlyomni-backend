@@ -37,6 +37,12 @@ namespace MeetlyOmni.Api.Data.Configurations
                    .HasForeignKey(g => g.CreatedBy)
                    .OnDelete(DeleteBehavior.SetNull);
 
+            // Navigation to EventGameInstances
+            builder.HasMany(g => g.EventGameInstances)
+                   .WithOne(egi => egi.Game)
+                   .HasForeignKey(egi => egi.GameId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             // Performance indexes
             builder.HasIndex(g => g.Type)
                    .HasDatabaseName("IX_Game_Type");

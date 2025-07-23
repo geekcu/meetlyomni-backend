@@ -2,6 +2,20 @@
 
 This project is a .NET 8 Web API backend supporting the Meetly Omni application. It provides RESTful APIs, database operations, and server-side logic.
 
+## 🚀 Quick Start
+
+**New to this project?** Follow our comprehensive [Setup Guide](./SETUP-GUIDE.md) to get everything running locally.
+
+### For Experienced Developers
+```bash
+# Quick setup (assumes PostgreSQL is running)
+git clone <repository-url>
+cd MeetlyOmni/meetlyomni-backend
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=meetlyomni_dev;Username=your_user;Password=your_password"
+dotnet ef database update --project src/MeetlyOmni.Api
+dotnet run --project src/MeetlyOmni.Api
+```
+
 ## Technology Stack
 
 - **.NET 8**: The latest long-term support version of .NET
@@ -59,3 +73,23 @@ The pre-commit hook automatically runs before each commit:
 - **Unit testing**: `dotnet test MeetlyOmni.sln --no-build`
 
 If any step fails, the commit will be blocked until issues are resolved.
+
+## API Documentation
+
+Once running, visit:
+- **Swagger UI**: https://localhost:5001/swagger
+- **Health Check**: https://localhost:5001/health
+
+## Contributing
+
+1. Follow the [Setup Guide](./SETUP-GUIDE.md) to configure your environment
+2. Create a feature branch from `main`
+3. Make your changes with appropriate tests
+4. Ensure all Git hooks pass
+5. Submit a pull request with a clear description
+
+## Support
+
+- 📖 **Setup Issues**: See [SETUP-GUIDE.md](./SETUP-GUIDE.md)
+- 🐛 **Bugs**: Create an issue with reproduction steps
+- 💡 **Feature Requests**: Discuss with the team first
