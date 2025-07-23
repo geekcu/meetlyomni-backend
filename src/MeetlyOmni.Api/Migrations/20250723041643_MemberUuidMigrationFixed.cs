@@ -11,6 +11,9 @@ namespace MeetlyOmni.Api.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // ⚠️ WARNING: This migration changes primary key types and will affect existing data
+            // For production environments, ensure proper data backup and migration strategy
+
             // Drop foreign key constraints first
             migrationBuilder.DropForeignKey(
                 name: "FK_GameRecord_Members_MemberId",
@@ -27,6 +30,25 @@ namespace MeetlyOmni.Api.Migrations
             migrationBuilder.DropPrimaryKey(
                 name: "PK_Members",
                 table: "Members");
+
+            // Create a temporary mapping table to preserve member relationships
+            migrationBuilder.Sql(@"
+                CREATE TABLE IF NOT EXISTS member_id_mapping (
+                    old_member_id VARCHAR(50) PRIMARY KEY,
+                    new_member_id UUID DEFAULT gen_random_uuid(),
+                    org_id UUID NOT NULL,
+                    local_member_number INTEGER NOT NULL,
+                    created_at TIMESTAMP DEFAULT NOW()
+                );
+            ");
+
+            // Populate mapping table with existing member data (if any exists)
+            migrationBuilder.Sql(@"
+                INSERT INTO member_id_mapping (old_member_id, org_id, local_member_number)
+                SELECT ""MemberId"", ""OrgId"", ""LocalMemberNumber""
+                FROM ""Members""
+                ON CONFLICT (old_member_id) DO NOTHING;
+            ");
 
             // Drop the old string MemberId column
             migrationBuilder.DropColumn(
@@ -57,22 +79,68 @@ namespace MeetlyOmni.Api.Migrations
                 table: "Members",
                 column: "Id");
 
-            // Use raw SQL to handle PostgreSQL string to UUID conversion
-            // This will clear existing data and regenerate UUIDs
+            // Update Members table with mapped UUIDs where possible
             migrationBuilder.Sql(@"
-                -- Clear existing data from related tables since we can't preserve relationships
-                TRUNCATE TABLE ""RaffleTickets"" CASCADE;
-                TRUNCATE TABLE ""MemberActivityLogs"" CASCADE;
-                TRUNCATE TABLE ""GameRecord"" CASCADE;
-                TRUNCATE TABLE ""Members"" CASCADE;
+                UPDATE ""Members"" 
+                SET ""Id"" = (
+                    SELECT new_member_id 
+                    FROM member_id_mapping 
+                    WHERE member_id_mapping.org_id = ""Members"".""OrgId"" 
+                    AND member_id_mapping.local_member_number = ""Members"".""LocalMemberNumber""
+                    LIMIT 1
+                )
+                WHERE EXISTS (
+                    SELECT 1 FROM member_id_mapping 
+                    WHERE member_id_mapping.org_id = ""Members"".""OrgId"" 
+                    AND member_id_mapping.local_member_number = ""Members"".""LocalMemberNumber""
+                );
             ");
 
-            // Convert foreign key columns to UUID type
+            // Convert foreign key columns to UUID type using mapping where possible
             migrationBuilder.Sql(@"
-                ALTER TABLE ""RaffleTickets"" ALTER COLUMN ""MemberId"" TYPE uuid USING gen_random_uuid();
-                ALTER TABLE ""MemberActivityLogs"" ALTER COLUMN ""MemberId"" TYPE uuid USING gen_random_uuid();
-                ALTER TABLE ""GameRecord"" ALTER COLUMN ""MemberId"" TYPE uuid USING gen_random_uuid();
+                -- Update RaffleTickets
+                ALTER TABLE ""RaffleTickets"" ADD COLUMN ""NewMemberId"" UUID;
+                
+                UPDATE ""RaffleTickets"" 
+                SET ""NewMemberId"" = m.new_member_id
+                FROM member_id_mapping m
+                WHERE ""RaffleTickets"".""MemberId"" = m.old_member_id;
+                
+                ALTER TABLE ""RaffleTickets"" DROP COLUMN ""MemberId"";
+                ALTER TABLE ""RaffleTickets"" RENAME COLUMN ""NewMemberId"" TO ""MemberId"";
+                ALTER TABLE ""RaffleTickets"" ALTER COLUMN ""MemberId"" SET NOT NULL;
             ");
+
+            migrationBuilder.Sql(@"
+                -- Update MemberActivityLogs
+                ALTER TABLE ""MemberActivityLogs"" ADD COLUMN ""NewMemberId"" UUID;
+                
+                UPDATE ""MemberActivityLogs"" 
+                SET ""NewMemberId"" = m.new_member_id
+                FROM member_id_mapping m
+                WHERE ""MemberActivityLogs"".""MemberId"" = m.old_member_id;
+                
+                ALTER TABLE ""MemberActivityLogs"" DROP COLUMN ""MemberId"";
+                ALTER TABLE ""MemberActivityLogs"" RENAME COLUMN ""NewMemberId"" TO ""MemberId"";
+                ALTER TABLE ""MemberActivityLogs"" ALTER COLUMN ""MemberId"" SET NOT NULL;
+            ");
+
+            migrationBuilder.Sql(@"
+                -- Update GameRecord
+                ALTER TABLE ""GameRecord"" ADD COLUMN ""NewMemberId"" UUID;
+                
+                UPDATE ""GameRecord"" 
+                SET ""NewMemberId"" = m.new_member_id
+                FROM member_id_mapping m
+                WHERE ""GameRecord"".""MemberId"" = m.old_member_id;
+                
+                ALTER TABLE ""GameRecord"" DROP COLUMN ""MemberId"";
+                ALTER TABLE ""GameRecord"" RENAME COLUMN ""NewMemberId"" TO ""MemberId"";
+                ALTER TABLE ""GameRecord"" ALTER COLUMN ""MemberId"" SET NOT NULL;
+            ");
+
+            // Clean up mapping table (optional - keep for debugging)
+            // migrationBuilder.Sql("DROP TABLE IF EXISTS member_id_mapping;");
 
             // Recreate foreign key relationships
             migrationBuilder.AddForeignKey(
@@ -111,6 +179,8 @@ namespace MeetlyOmni.Api.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            // ⚠️ WARNING: Rollback will result in data loss as UUID to string conversion is not reversible
+            
             // Drop foreign key constraints
             migrationBuilder.DropForeignKey(
                 name: "FK_Game_Members_CreatedBy",
@@ -148,7 +218,7 @@ namespace MeetlyOmni.Api.Migrations
                 table: "Members",
                 newName: "IX_Member_OrgId_Email");
 
-            // Restore string columns
+            // Restore string columns - this will result in data loss
             migrationBuilder.AddColumn<string>(
                 name: "MemberId",
                 table: "Members",
@@ -157,7 +227,7 @@ namespace MeetlyOmni.Api.Migrations
                 nullable: false,
                 defaultValue: "");
 
-            // Convert foreign key columns back to string
+            // Convert foreign key columns back to string - this will result in data loss
             migrationBuilder.Sql(@"
                 ALTER TABLE ""RaffleTickets"" ALTER COLUMN ""MemberId"" TYPE character varying(50) USING ''::character varying(50);
                 ALTER TABLE ""MemberActivityLogs"" ALTER COLUMN ""MemberId"" TYPE character varying(50) USING ''::character varying(50);
@@ -168,6 +238,9 @@ namespace MeetlyOmni.Api.Migrations
                 name: "PK_Members",
                 table: "Members",
                 column: "MemberId");
+
+            // Clean up mapping table
+            migrationBuilder.Sql("DROP TABLE IF EXISTS member_id_mapping;");
 
             // Recreate old foreign key relationships
             migrationBuilder.AddForeignKey(

@@ -1,48 +1,52 @@
-# 测试Git钩子是否正常工作的脚本
-Write-Host "🧪 正在测试Git钩子..."
+# Test Git hooks functionality script
+Write-Host "Testing Git hooks..." -ForegroundColor Cyan
 
-# 检查pre-commit钩子是否存在
+# Check if pre-commit hook exists
 if (Test-Path .git/hooks/pre-commit) {
-    Write-Host "✅ pre-commit钩子文件存在"
+    Write-Host "pre-commit hook file exists" -ForegroundColor Green
     
-    # 显示钩子内容
-    Write-Host "`n📄 钩子内容："
-    Get-Content .git/hooks/pre-commit | ForEach-Object { Write-Host "  $_" }
+    # Display hook content
+    Write-Host "`nHook content:" -ForegroundColor Yellow
+    Get-Content .git/hooks/pre-commit | ForEach-Object { Write-Host "  $_" -ForegroundColor White }
     
-    # 测试dotnet命令
-    Write-Host "`n🔍 测试dotnet命令可用性..."
+    # Test dotnet commands availability
+    Write-Host "`nTesting dotnet command availability..." -ForegroundColor Cyan
     
     try {
         $formatResult = dotnet format MeetlyOmni.sln --dry-run --verbosity quiet 2>&1
-        Write-Host "✅ dotnet format: 可用"
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "dotnet format: Available" -ForegroundColor Green
+        } else {
+            Write-Host "dotnet format: Has formatting issues that need to be fixed" -ForegroundColor Yellow
+        }
     } catch {
-        Write-Host "❌ dotnet format: 失败 - $_"
+        Write-Host "dotnet format: Failed - $_" -ForegroundColor Red
     }
     
     try {
         $buildResult = dotnet build MeetlyOmni.sln --no-restore --verbosity quiet 2>&1
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "✅ dotnet build: 成功"
+            Write-Host "dotnet build: Success" -ForegroundColor Green
         } else {
-            Write-Host "⚠️  dotnet build: 有警告或错误"
+            Write-Host "dotnet build: Has warnings or errors" -ForegroundColor Yellow
         }
     } catch {
-        Write-Host "❌ dotnet build: 失败 - $_"
+        Write-Host "dotnet build: Failed - $_" -ForegroundColor Red
     }
     
     try {
         $testResult = dotnet test MeetlyOmni.sln --no-build --verbosity quiet 2>&1
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "✅ dotnet test: 成功"
+            Write-Host "dotnet test: Success" -ForegroundColor Green
         } else {
-            Write-Host "⚠️  dotnet test: 有失败的测试"
+            Write-Host "dotnet test: Has failing tests" -ForegroundColor Yellow
         }
     } catch {
-        Write-Host "❌ dotnet test: 失败 - $_"
+        Write-Host "dotnet test: Failed - $_" -ForegroundColor Red
     }
     
-    Write-Host "`n🎉 钩子测试完成！现在可以正常提交代码了。"
+    Write-Host "`nHook testing completed! You can now commit code normally." -ForegroundColor Green
 } else {
-    Write-Host "❌ pre-commit钩子文件不存在"
-    Write-Host "请运行: .\setup-git-hooks.ps1"
+    Write-Host "pre-commit hook file does not exist" -ForegroundColor Red
+    Write-Host "Please run: .\setup-git-hooks.ps1" -ForegroundColor Yellow
 } 
