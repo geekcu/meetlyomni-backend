@@ -1,10 +1,15 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿// <copyright file="20250722072819_AddMissingConstraintsAndIndexes.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
+// </copyright>
 
 #nullable disable
 
 namespace MeetlyOmni.Api.Migrations
 {
+    using System;
+
+    using Microsoft.EntityFrameworkCore.Migrations;
+
     /// <inheritdoc />
     public partial class AddMissingConstraintsAndIndexes : Migration
     {
