@@ -23,6 +23,8 @@ namespace MeetlyOmni.Api.Data.Entities
         public DateTimeOffset CreatedAt { get; set; }
 
         // Navigation
+        public Member? Creator { get; set; }
+
         public ICollection<EventGameInstance> EventGameInstances { get; set; } = new List<EventGameInstance>();
     }
 }

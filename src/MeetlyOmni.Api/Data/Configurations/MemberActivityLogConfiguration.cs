@@ -18,8 +18,7 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.HasKey(x => x.LogId);
 
             builder.Property(x => x.MemberId)
-                   .IsRequired()
-                   .HasMaxLength(50);
+                   .IsRequired();
 
             builder.Property(x => x.OrgId)
                    .IsRequired();

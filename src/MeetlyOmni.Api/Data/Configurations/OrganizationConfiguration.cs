@@ -18,7 +18,7 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.HasKey(o => o.OrgId);
 
             builder.ConfigureString(o => o.OrganizationCode, maxLength: 30);
-
+            
             // Unique constraint - OrganizationCode must be unique globally
             builder.HasIndex(o => o.OrganizationCode)
                    .IsUnique()
