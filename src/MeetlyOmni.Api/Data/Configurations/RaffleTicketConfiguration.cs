@@ -20,8 +20,7 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.Property(x => x.OrgId).IsRequired();
 
             builder.Property(x => x.MemberId)
-                   .IsRequired()
-                   .HasMaxLength(50);
+                   .IsRequired();
 
             builder.Property(x => x.IssueTime)
                    .HasDefaultValueSql("NOW()");

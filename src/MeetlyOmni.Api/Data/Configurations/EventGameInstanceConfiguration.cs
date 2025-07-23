@@ -40,6 +40,16 @@ namespace MeetlyOmni.Api.Data.Configurations
                    .WithOne(gr => gr.EventGameInstance)
                    .HasForeignKey(gr => gr.InstanceId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            // Performance indexes
+            builder.HasIndex(x => x.Status)
+                   .HasDatabaseName("IX_EventGameInstance_Status");
+
+            builder.HasIndex(x => new { x.EventId, x.OrderNum })
+                   .HasDatabaseName("IX_EventGameInstance_EventId_OrderNum");
+
+            builder.HasIndex(x => new { x.EventId, x.Status })
+                   .HasDatabaseName("IX_EventGameInstance_EventId_Status");
         }
     }
 }

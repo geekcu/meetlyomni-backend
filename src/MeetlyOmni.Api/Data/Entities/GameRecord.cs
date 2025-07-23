@@ -12,7 +12,7 @@ namespace MeetlyOmni.Api.Data.Entities
 
         public Guid InstanceId { get; set; }
 
-        public string MemberId { get; set; } = string.Empty;
+        public Guid MemberId { get; set; }
 
         public Guid OrgId { get; set; }
 

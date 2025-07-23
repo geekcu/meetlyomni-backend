@@ -5,6 +5,7 @@ using System.Text.Json.Nodes;
 using MeetlyOmni.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -13,9 +14,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeetlyOmni.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250722072819_AddMissingConstraintsAndIndexes")]
+    partial class AddMissingConstraintsAndIndexes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -235,8 +238,10 @@ namespace MeetlyOmni.Api.Migrations
                     b.Property<Guid>("InstanceId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("MemberId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("MemberId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<Guid>("OrgId")
                         .HasColumnType("uuid");
@@ -311,10 +316,9 @@ namespace MeetlyOmni.Api.Migrations
 
             modelBuilder.Entity("MeetlyOmni.Api.Data.Entities.Member", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("gen_random_uuid()");
+                    b.Property<string>("MemberId")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -331,7 +335,7 @@ namespace MeetlyOmni.Api.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
-                    b.Property<DateTimeOffset?>("LastLogin")
+                    b.Property<DateTime?>("LastLogin")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("LocalMemberNumber")
@@ -376,7 +380,7 @@ namespace MeetlyOmni.Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("NOW()");
 
-                    b.HasKey("Id");
+                    b.HasKey("MemberId");
 
                     b.HasIndex("CreatedAt")
                         .HasDatabaseName("IX_Member_CreatedAt");
@@ -386,11 +390,11 @@ namespace MeetlyOmni.Api.Migrations
 
                     b.HasIndex("OrgId", "Email")
                         .IsUnique()
-                        .HasDatabaseName("UK_Member_Org_Email");
+                        .HasDatabaseName("IX_Member_OrgId_Email");
 
                     b.HasIndex("OrgId", "LocalMemberNumber")
                         .IsUnique()
-                        .HasDatabaseName("UK_Member_Org_LocalNumber");
+                        .HasDatabaseName("IX_Member_OrgId_LocalMemberNumber");
 
                     b.HasIndex("OrgId", "Status")
                         .HasDatabaseName("IX_Member_OrgId_Status");
@@ -417,8 +421,10 @@ namespace MeetlyOmni.Api.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<Guid>("MemberId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("MemberId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<Guid>("OrgId")
                         .HasColumnType("uuid");
@@ -524,8 +530,10 @@ namespace MeetlyOmni.Api.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
-                    b.Property<Guid>("MemberId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("MemberId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<Guid>("OrgId")
                         .HasColumnType("uuid");
@@ -585,16 +593,6 @@ namespace MeetlyOmni.Api.Migrations
                     b.Navigation("Event");
 
                     b.Navigation("Game");
-                });
-
-            modelBuilder.Entity("MeetlyOmni.Api.Data.Entities.Game", b =>
-                {
-                    b.HasOne("MeetlyOmni.Api.Data.Entities.Member", "Creator")
-                        .WithMany("CreatedGames")
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("MeetlyOmni.Api.Data.Entities.GameRecord", b =>
@@ -706,8 +704,6 @@ namespace MeetlyOmni.Api.Migrations
             modelBuilder.Entity("MeetlyOmni.Api.Data.Entities.Member", b =>
                 {
                     b.Navigation("ActivityLogs");
-
-                    b.Navigation("CreatedGames");
 
                     b.Navigation("GameRecords");
 

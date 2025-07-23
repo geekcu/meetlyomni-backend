@@ -15,9 +15,10 @@ namespace MeetlyOmni.Api.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Member> builder)
         {
-            builder.HasKey(m => m.MemberId);
-            builder.Property(m => m.MemberId)
-                   .HasMaxLength(50)
+            // Primary key - UUID
+            builder.HasKey(m => m.Id);
+            builder.Property(m => m.Id)
+                   .HasDefaultValueSql("gen_random_uuid()")
                    .IsRequired();
 
             builder.Property(m => m.OrgId).IsRequired();
@@ -49,6 +50,25 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.HasOne(m => m.Organization)
                    .WithMany(o => o.Members)
                    .HasForeignKey(m => m.OrgId);
+
+            // Business unique constraints - these are the natural keys for SaaS login
+            builder.HasIndex(m => new { m.OrgId, m.LocalMemberNumber })
+                   .IsUnique()
+                   .HasDatabaseName("UK_Member_Org_LocalNumber");
+
+            builder.HasIndex(m => new { m.OrgId, m.Email })
+                   .IsUnique()
+                   .HasDatabaseName("UK_Member_Org_Email");
+
+            // Performance optimization indexes
+            builder.HasIndex(m => m.Status)
+                   .HasDatabaseName("IX_Member_Status");
+
+            builder.HasIndex(m => m.CreatedAt)
+                   .HasDatabaseName("IX_Member_CreatedAt");
+
+            builder.HasIndex(m => new { m.OrgId, m.Status })
+                   .HasDatabaseName("IX_Member_OrgId_Status");
         }
     }
 }

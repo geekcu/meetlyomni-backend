@@ -8,7 +8,7 @@ namespace MeetlyOmni.Api.Data.Entities
 
     public class Member
     {
-        public string MemberId { get; set; } = string.Empty;
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         public Guid OrgId { get; set; }
 
@@ -30,7 +30,7 @@ namespace MeetlyOmni.Api.Data.Entities
 
         public MemberStatus Status { get; set; } = MemberStatus.Active;
 
-        public DateTime? LastLogin { get; set; }
+        public DateTimeOffset? LastLogin { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
 
@@ -44,5 +44,7 @@ namespace MeetlyOmni.Api.Data.Entities
         public ICollection<RaffleTicket> RaffleTickets { get; set; } = new List<RaffleTicket>();
 
         public ICollection<GameRecord> GameRecords { get; set; } = new List<GameRecord>();
+
+        public ICollection<Game> CreatedGames { get; set; } = new List<Game>();
     }
 }
