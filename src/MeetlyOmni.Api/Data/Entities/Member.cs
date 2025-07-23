@@ -30,7 +30,7 @@ namespace MeetlyOmni.Api.Data.Entities
 
         public MemberStatus Status { get; set; } = MemberStatus.Active;
 
-        public DateTime? LastLogin { get; set; }
+        public DateTimeOffset? LastLogin { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
 

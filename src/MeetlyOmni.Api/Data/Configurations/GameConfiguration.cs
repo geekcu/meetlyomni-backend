@@ -25,11 +25,21 @@ namespace MeetlyOmni.Api.Data.Configurations
 
             builder.ConfigureJsonbObject(g => g.Config);
 
+            builder.Property(g => g.CreatedBy)
+                   .IsRequired(false);
+
             builder.Property(g => g.CreatedAt)
                    .HasDefaultValueSql("NOW()");
 
             // Foreign key relationships (CreatedBy可能指向Member或Organization，这里先留空)
             // TODO: 根据业务需求设置CreatedBy的外键关系
+
+            // CreatedBy relationship (assuming it points to Organization)
+            // Uncomment when the relationship is clarified:
+            // builder.HasOne<Organization>()
+            //        .WithMany()
+            //        .HasForeignKey(g => g.CreatedBy)
+            //        .OnDelete(DeleteBehavior.SetNull);
 
             // Performance indexes
             builder.HasIndex(g => g.Type)
