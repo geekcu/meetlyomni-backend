@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Nodes;
+using Newtonsoft.Json;
 
 public static class LaunchSettingsReader
 {
@@ -14,7 +15,16 @@ public static class LaunchSettingsReader
             throw new FileNotFoundException("launchSettings.json not found", pathToLaunchSettings);
 
         var json = File.ReadAllText(pathToLaunchSettings);
-        var root = JsonNode.Parse(json);
+        JsonNode? root;
+        
+        try
+        {
+            root = JsonNode.Parse(json);
+        }
+        catch (JsonException ex)
+        {
+            throw new InvalidOperationException("Failed to parse launchSettings.json", ex);
+        }
 
         var profiles = root?["profiles"]?.AsObject();
         if (profiles == null || !profiles.ContainsKey(profileName))
@@ -25,7 +35,14 @@ public static class LaunchSettingsReader
             throw new InvalidOperationException("applicationUrl is missing");
 
         // Return the first URL (https preferred)
-        return appUrls.Split(';')
-                      .FirstOrDefault(u => u.StartsWith("https")) ?? appUrls.Split(';').First();
+        var urls = appUrls.Split(';', StringSplitOptions.RemoveEmptyEntries)
+                            .Select(u => u.Trim())
+                            .Where(u => !string.IsNullOrEmpty(u))
+                            .ToArray();
+
+        if (!urls.Any())
+            throw new InvalidOperationException("No valid URLs found in applicationUrl");
+
+        return urls.FirstOrDefault(u => u.StartsWith("https", StringComparison.OrdinalIgnoreCase)) ?? urls.First();
     }
 }
