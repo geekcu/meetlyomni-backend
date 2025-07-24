@@ -1,15 +1,19 @@
-using System.Net.Http;
-using System.Threading.Tasks;
-using Xunit;
-
 public class BackendStatusTests
 {
-    private readonly HttpClient _httpClient = new HttpClient();
-
     [Fact]
     public async Task Backend_Is_Available()
     {
-        var response = await _httpClient.GetAsync("https://localhost:7011/swagger/index.html");
-        response.EnsureSuccessStatusCode(); // Ensures 200-299
+        using var httpClient = new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(30)
+        };
+
+        var baseUrl = LaunchSettingsReader.GetBaseUrl();
+        var response = await httpClient.GetAsync($"{baseUrl}/swagger/index.html");
+
+        Assert.True(response.IsSuccessStatusCode, $"Backend is not available. Status: {response.StatusCode}, Reason: {response.ReasonPhrase}");
+
+        var content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("swagger", content.ToLowerInvariant());
     }
 }
