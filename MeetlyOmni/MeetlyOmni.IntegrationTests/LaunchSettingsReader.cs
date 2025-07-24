@@ -4,10 +4,11 @@ public static class LaunchSettingsReader
 {
     public static string GetBaseUrl(string profileName = "https")
     {
+        if (string.IsNullOrWhiteSpace(profileName))
+            throw new ArgumentException("Profile name cannot be null or empty", nameof(profileName));
         // Adjust path to point to your API project relative to the test project
-        var pathToLaunchSettings = Path.Combine(
-            AppContext.BaseDirectory, // bin/Debug/net8.0
-            "../../../../MeetlyOmni.Api/Properties/launchSettings.json");
+        var apiProjectPath = Environment.GetEnvironmentVariable("API_PROJECT_PATH") ?? Path.Combine(AppContext.BaseDirectory, "../../../../MeetlyOmni.Api");
+        var pathToLaunchSettings = Path.Combine(apiProjectPath, "Properties", "launchSettings.json");
 
         if (!File.Exists(pathToLaunchSettings))
             throw new FileNotFoundException("launchSettings.json not found", pathToLaunchSettings);

@@ -1,3 +1,4 @@
+namespace MeetlyOmni.IntegrationTests;
 public class BackendStatusTests
 {
     [Fact]
