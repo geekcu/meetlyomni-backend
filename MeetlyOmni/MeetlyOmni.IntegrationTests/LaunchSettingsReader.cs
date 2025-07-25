@@ -2,6 +2,8 @@
 
 using Newtonsoft.Json;
 
+namespace MeetlyOmni.IntegrationTests;
+
 public static class LaunchSettingsReader
 {
     public static string GetBaseUrl(string profileName = "https")
@@ -9,7 +11,10 @@ public static class LaunchSettingsReader
         if (string.IsNullOrWhiteSpace(profileName))
             throw new ArgumentException("Profile name cannot be null or empty", nameof(profileName));
         // Adjust path to point to your API project relative to the test project
-        var apiProjectPath = Environment.GetEnvironmentVariable("API_PROJECT_PATH") ?? Path.Combine(AppContext.BaseDirectory, "../../../../MeetlyOmni.Api");
+        var apiProjectPath = Environment.GetEnvironmentVariable("API_PROJECT_PATH") ??
+            FindApiProjectPath() ??
+            throw new InvalidOperationException("Unable to locate MeetlyOmni.Api project. Set API_PROJECT_PATH environment variable.");
+        //Path.Combine(AppContext.BaseDirectory, "../../../../MeetlyOmni.Api");
         var pathToLaunchSettings = Path.Combine(apiProjectPath, "Properties", "launchSettings.json");
 
         if (!File.Exists(pathToLaunchSettings))
@@ -45,5 +50,18 @@ public static class LaunchSettingsReader
             throw new InvalidOperationException("No valid URLs found in applicationUrl");
 
         return urls.FirstOrDefault(u => u.StartsWith("https", StringComparison.OrdinalIgnoreCase)) ?? urls.First();
+    }
+
+    private static string? FindApiProjectPath()
+    {
+        var currentDir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (currentDir != null)
+        {
+            var apiProjectDir = Path.Combine(currentDir.FullName, "MeetlyOmni.Api");
+            if (Directory.Exists(apiProjectDir))
+                return apiProjectDir;
+            currentDir = currentDir.Parent;
+        }
+        return null;
     }
 }
