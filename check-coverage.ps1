@@ -24,7 +24,7 @@ if ($LASTEXITCODE -ne 0) {
 
 # Generate coverage report
 Write-Host "Generating coverage report..." -ForegroundColor Yellow
-dotnet reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html
+reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html
 
 # Extract current coverage percentage
 $coverageFile = Get-ChildItem -Path "coverage" -Filter "coverage.cobertura.xml" -Recurse | Select-Object -First 1
@@ -39,7 +39,7 @@ if ($coverageFile) {
         
         # Check minimum threshold
         if ($currentCoveragePercent -lt $MinThreshold) {
-            Write-Host "❌ Coverage below minimum threshold of ${MinThreshold}%" -ForegroundColor Red
+            Write-Host "Coverage below minimum threshold of ${MinThreshold}%" -ForegroundColor Red
             Write-Host "Current coverage: ${currentCoveragePercent}%" -ForegroundColor Red
             Write-Host "Detailed report: coverage/report/index.html" -ForegroundColor Yellow
             exit 1
@@ -58,7 +58,7 @@ if ($coverageFile) {
                 Write-Host "Previous coverage: ${previousCoveragePercent}%" -ForegroundColor Cyan
                 
                 if ($currentCoveragePercent -lt $previousCoveragePercent) {
-                    Write-Host "❌ Coverage regression detected!" -ForegroundColor Red
+                    Write-Host "Coverage regression detected!" -ForegroundColor Red
                     Write-Host "Previous: ${previousCoveragePercent}%" -ForegroundColor Red
                     Write-Host "Current: ${currentCoveragePercent}%" -ForegroundColor Red
                     Write-Host "Detailed report: coverage/report/index.html" -ForegroundColor Yellow
@@ -70,7 +70,7 @@ if ($coverageFile) {
         # Save current coverage for future comparison
         $currentCoverage | Out-File -FilePath "coverage/coverage.txt" -Encoding ASCII
         
-        Write-Host "✅ Coverage check passed!" -ForegroundColor Green
+        Write-Host "Coverage check passed!" -ForegroundColor Green
         Write-Host "Current coverage: ${currentCoveragePercent}%" -ForegroundColor Green
         Write-Host "Detailed report: coverage/report/index.html" -ForegroundColor Cyan
     } else {

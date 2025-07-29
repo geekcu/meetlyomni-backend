@@ -1,4 +1,4 @@
-# 🚀 MeetlyOmni Backend Setup Guide
+# MeetlyOmni Backend Setup Guide
 
 This guide will help new team members set up the MeetlyOmni backend project on their local machine.
 
@@ -252,7 +252,7 @@ dotnet tool install --global dotnet-ef
 # Restart your terminal and try again
 ```
 
-## 🎯 Development Workflow
+## Development Workflow
 
 ### Daily Development
 1. **Pull latest changes**: `git pull origin main`

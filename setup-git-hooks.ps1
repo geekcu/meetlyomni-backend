@@ -70,7 +70,7 @@ echo "Current coverage: ${CURRENT_COVERAGE_PERCENT}%"
 
 # Check minimum threshold (80%)
 if [ "$CURRENT_COVERAGE_PERCENT" -lt 80 ]; then
-    echo "❌ Coverage below minimum threshold of 80%"
+    echo "Coverage below minimum threshold of 80%"
     echo "Current coverage: ${CURRENT_COVERAGE_PERCENT}%"
     echo "Detailed report: coverage/report/index.html"
     exit 1
@@ -86,7 +86,7 @@ if [ "$PREVIOUS_COVERAGE" != "0" ]; then
     echo "Previous coverage: ${PREVIOUS_COVERAGE_PERCENT}%"
     
     if [ "$CURRENT_COVERAGE_PERCENT" -lt "$PREVIOUS_COVERAGE_PERCENT" ]; then
-        echo "❌ Coverage regression detected!"
+        echo "Coverage regression detected!"
         echo "Previous: ${PREVIOUS_COVERAGE_PERCENT}%"
         echo "Current: ${CURRENT_COVERAGE_PERCENT}%"
         echo "Detailed report: coverage/report/index.html"
@@ -97,7 +97,7 @@ fi
 # Save current coverage for future comparison
 echo "$CURRENT_COVERAGE" > coverage/coverage.txt
 
-echo "✅ Coverage check passed!"
+echo "Coverage check passed!"
 echo "Current coverage: ${CURRENT_COVERAGE_PERCENT}%"
 echo "Detailed report: coverage/report/index.html"
 '@
@@ -142,7 +142,7 @@ if ($coverageFile) {
         
         # Check minimum threshold (80%)
         if ($currentCoveragePercent -lt 80) {
-            Write-Host "❌ Coverage below minimum threshold of 80%" -ForegroundColor Red
+            Write-Host "Coverage below minimum threshold of 80%" -ForegroundColor Red
             Write-Host "Current coverage: ${currentCoveragePercent}%" -ForegroundColor Red
             Write-Host "Detailed report: coverage/report/index.html" -ForegroundColor Yellow
             exit 1
@@ -160,7 +160,7 @@ if ($coverageFile) {
             Write-Host "Previous coverage: ${previousCoveragePercent}%" -ForegroundColor Cyan
             
             if ($currentCoveragePercent -lt $previousCoveragePercent) {
-                Write-Host "❌ Coverage regression detected!" -ForegroundColor Red
+                Write-Host "Coverage regression detected!" -ForegroundColor Red
                 Write-Host "Previous: ${previousCoveragePercent}%" -ForegroundColor Red
                 Write-Host "Current: ${currentCoveragePercent}%" -ForegroundColor Red
                 Write-Host "Detailed report: coverage/report/index.html" -ForegroundColor Yellow
@@ -171,7 +171,7 @@ if ($coverageFile) {
         # Save current coverage for future comparison
         $currentCoverage | Out-File -FilePath $previousCoverageFile -Encoding ASCII
         
-        Write-Host "✅ Coverage check passed!" -ForegroundColor Green
+        Write-Host "Coverage check passed!" -ForegroundColor Green
         Write-Host "Current coverage: ${currentCoveragePercent}%" -ForegroundColor Green
         Write-Host "Detailed report: coverage/report/index.html" -ForegroundColor Cyan
     } else {

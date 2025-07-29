@@ -2,7 +2,7 @@
 
 This project is a .NET 8 Web API backend supporting the Meetly Omni application. It provides RESTful APIs, database operations, and server-side logic.
 
-## 🚀 Quick Start
+## Quick Start
 
 **New to this project?** Follow our comprehensive [Setup Guide](./SETUP-GUIDE.md) to get everything running locally.
 
@@ -54,17 +54,57 @@ src/
 
 This project uses Git hooks to ensure code quality and maintain high test coverage. New team members need to set up the hooks after cloning the repository.
 
-### Setup Instructions
+### Quick Start Guide
 
-#### Quick Setup (Recommended)
+#### Step 1: Initial Setup (One-time)
 For new team members or project initialization:
 
 ```powershell
-# One-command setup
+# Clone the repository
+git clone <repository-url>
+cd meetlyomni-backend
+
+# One-command setup (recommended)
 .\init-project.ps1
 ```
 
-#### Manual Setup (Advanced)
+**What this does:**
+- Installs required coverage tools
+- Sets up Git hooks (pre-commit and pre-push)
+- Tests the setup
+- Provides next steps guidance
+
+#### Step 2: Verify Setup
+After running the setup, verify everything works:
+
+```powershell
+# Test the hooks
+.\test-git-hooks.ps1
+
+# Check coverage manually
+.\check-coverage.ps1
+```
+
+**Expected output:**
+- All tools are available
+- Hooks are properly installed
+- Coverage will be 0% initially (this is normal)
+
+#### Step 3: Start Development
+Now you can start developing with automatic quality checks:
+
+```powershell
+# Make changes to your code
+# Add tests for your new features
+# Commit your changes (hooks will run automatically)
+git add .
+git commit -m "Add new feature"
+
+# Push your changes (coverage check will run)
+git push
+```
+
+### Manual Setup (Advanced)
 If you prefer to run scripts individually:
 
 1. **Install coverage tools** (required once):
@@ -115,6 +155,56 @@ To manually check code coverage locally:
 .\check-coverage.ps1 -SkipRegressionCheck
 ```
 
+### Understanding Code Coverage
+
+#### Initial State (0% Coverage)
+When you first set up the project, you'll see **0% coverage**. This is **normal and expected** because:
+
+- **Tests exist** but they're empty placeholder tests
+- **No business code is being tested** yet
+- **You need to write actual tests** for your API code
+
+#### How to Improve Coverage
+To reach the 80% coverage requirement:
+
+1. **Write tests for your Controllers:**
+   ```csharp
+   [Fact]
+   public async Task GetMembers_ShouldReturnMembers()
+   {
+       var controller = new MemberController(memberService);
+       var result = await controller.GetMembers();
+       Assert.NotNull(result);
+   }
+   ```
+
+2. **Write tests for your Services:**
+   ```csharp
+   [Fact]
+   public async Task CreateMember_ShouldCreateNewMember()
+   {
+       var service = new MemberService(repository);
+       var member = await service.CreateMember(new MemberDto());
+       Assert.NotNull(member);
+   }
+   ```
+
+3. **Write tests for your Repositories:**
+   ```csharp
+   [Fact]
+   public async Task GetById_ShouldReturnMember()
+   {
+       var repository = new MemberRepository(context);
+       var member = await repository.GetByIdAsync(1);
+       Assert.NotNull(member);
+   }
+   ```
+
+#### Coverage Goals
+- **Minimum threshold**: 80% line coverage
+- **Regression prevention**: Coverage cannot decrease
+- **Focus areas**: Controllers, Services, Repositories
+
 ### Coverage Reports
 
 After running coverage checks, detailed HTML reports are available at:
@@ -139,6 +229,52 @@ Or install manually:
    ```bash
    dotnet tool install -g dotnet-reportgenerator-globaltool
    ```
+
+### Troubleshooting
+
+#### Common Issues
+
+**Problem**: `dotnet-reportgenerator does not exist`
+```powershell
+# Solution: Reinstall the tool
+dotnet tool uninstall -g dotnet-reportgenerator-globaltool
+dotnet tool install -g dotnet-reportgenerator-globaltool
+```
+
+**Problem**: `bc: command not found` (Windows)
+```powershell
+# Solution: Use PowerShell version instead
+# The pre-push hook will automatically use PowerShell on Windows
+```
+
+**Problem**: Coverage stuck at 0%
+- **Normal for new projects**
+- **Write actual tests** for your business code
+- **Focus on Controllers, Services, Repositories**
+
+**Problem**: Push blocked by coverage check
+```powershell
+# Temporary bypass (use sparingly)
+git push --no-verify
+
+# Better: Write tests to improve coverage
+```
+
+#### Getting Help
+
+1. **Check tool installation:**
+   ```powershell
+   dotnet tool list -g
+   ```
+
+2. **Test hooks manually:**
+   ```powershell
+   .\test-git-hooks.ps1
+   ```
+
+3. **Check coverage report:**
+   - Open `coverage/report/index.html` in browser
+   - Look for specific uncovered lines
 
 ## API Documentation
 
