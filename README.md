@@ -52,30 +52,93 @@ src/
 
 ## Git Hooks Setup
 
-This project uses Git pre-commit hooks to ensure code quality. New team members need to set up the hooks after cloning the repository.
+This project uses Git hooks to ensure code quality and maintain high test coverage. New team members need to set up the hooks after cloning the repository.
 
 ### Setup Instructions
 
-1. **Set up Git hooks** (required for new team members):
+#### Quick Setup (Recommended)
+For new team members or project initialization:
 
+```powershell
+# One-command setup
+.\init-project.ps1
+```
+
+#### Manual Setup (Advanced)
+If you prefer to run scripts individually:
+
+1. **Install coverage tools** (required once):
+   ```powershell
+   .\install-coverage-tools.ps1
+   ```
+
+2. **Set up Git hooks** (required once):
    ```powershell
    .\setup-git-hooks.ps1
    ```
 
-2. **Test hooks** (optional, to verify setup):
+3. **Test hooks** (optional, to verify setup):
    ```powershell
    .\test-git-hooks.ps1
    ```
 
 ### What the hooks do
 
-The pre-commit hook automatically runs before each commit:
+#### Pre-commit Hook
+Automatically runs before each commit:
 
 - **Code formatting**: `dotnet format MeetlyOmni.sln`
 - **Build validation**: `dotnet build MeetlyOmni.sln --no-restore`
 - **Unit testing**: `dotnet test MeetlyOmni.sln --no-build`
 
-If any step fails, the commit will be blocked until issues are resolved.
+#### Pre-push Hook
+Automatically runs before each push:
+
+- **Code coverage check**: Ensures minimum 80% line coverage
+- **Coverage regression prevention**: Prevents coverage from dropping below previous baseline
+- **Detailed reporting**: Generates HTML coverage reports
+
+If any step fails, the commit/push will be blocked until issues are resolved.
+
+### Manual Coverage Check
+
+To manually check code coverage locally:
+
+```powershell
+# Check coverage with default 80% threshold
+.\check-coverage.ps1
+
+# Check coverage with custom threshold
+.\check-coverage.ps1 -MinThreshold 85
+
+# Check coverage without regression check
+.\check-coverage.ps1 -SkipRegressionCheck
+```
+
+### Coverage Reports
+
+After running coverage checks, detailed HTML reports are available at:
+- `coverage/report/index.html`
+
+### Prerequisites
+
+For coverage checking to work, ensure you have the required tools installed:
+
+```powershell
+# Install coverage tools (run once)
+.\install-coverage-tools.ps1
+```
+
+Or install manually:
+1. **XPlat Code Coverage** package:
+   ```bash
+   dotnet tool install -g dotnet-coverage
+   ```
+
+2. **ReportGenerator** tool:
+   ```bash
+   dotnet tool install -g dotnet-reportgenerator-globaltool
+   ```
 
 ## API Documentation
 
