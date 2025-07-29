@@ -37,6 +37,9 @@ if ($coverageFile) {
         
         Write-Host "Current coverage: ${currentCoveragePercent}%" -ForegroundColor Green
         
+        # Save current coverage for future comparison
+        $currentCoveragePercent | Out-File -FilePath "coverage/coverage.txt" -Encoding ASCII
+        
         # Check minimum threshold
         if ($currentCoveragePercent -lt $MinThreshold) {
             Write-Host "Coverage below minimum threshold of ${MinThreshold}%" -ForegroundColor Red
@@ -66,9 +69,6 @@ if ($coverageFile) {
                 }
             }
         }
-        
-        # Save current coverage for future comparison
-        $currentCoverage | Out-File -FilePath "coverage/coverage.txt" -Encoding ASCII
         
         Write-Host "Coverage check passed!" -ForegroundColor Green
         Write-Host "Current coverage: ${currentCoveragePercent}%" -ForegroundColor Green
