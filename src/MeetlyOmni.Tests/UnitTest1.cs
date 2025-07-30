@@ -9,7 +9,6 @@ namespace MeetlyOmni.Tests
         [Fact]
         public void Test1()
         {
-            // test unit test coverage
         }
     }
 }
