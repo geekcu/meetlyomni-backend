@@ -22,23 +22,23 @@ namespace MeetlyOmni.Tests
             Assert.Equal("Hello, Alice!", result);
         }
 
-        // [Fact]
-        // public void GetFarewell_Returns_Custom_Message()
-        // {
-        //     var service = new GreetService();
-        //     var result = service.GetFarewell("Alice");
+        //[Fact]
+        //public void GetFarewell_Returns_Custom_Message()
+        //{
+        //    var service = new GreetService();
+        //    var result = service.GetFarewell("Alice");
 
-        // Assert.Equal("Goodbye, Alice!", result);
-        // }
+        //    Assert.Equal("Goodbye, Alice!", result);
+        //}
 
-        // [Fact]
-        // public void GetGreeting_Returns_Guest_When_Empty()
-        // {
-        //     var service = new GreetService();
-        //     var result = service.GetGreeting(string.Empty);
+        [Fact]
+        public void GetGreeting_Returns_Guest_When_Empty()
+        {
+            var service = new GreetService();
+            var result = service.GetGreeting(string.Empty);
 
-        // Assert.Equal("Hello, Guest!", result);
-        // }
+            Assert.Equal("Hello, Guest!", result);
+        }
     }
 
     public class GreetControllerTests
