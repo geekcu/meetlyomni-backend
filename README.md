@@ -140,20 +140,56 @@ Automatically runs before each push:
 
 If any step fails, the commit/push will be blocked until issues are resolved.
 
-### Manual Coverage Check
+### Enhanced Coverage System
+
+This project uses an **enhanced coverage system** that specifically targets **Controllers and Services** with baseline tracking and regression prevention.
+
+#### Quick Setup
+
+```powershell
+# Setup enhanced Git hooks
+.\setup-git-hooks-enhanced.ps1
+
+# Set initial baseline
+.\check-coverage-enhanced.ps1 -UpdateBaseline
+
+# Manual coverage check
+.\check-coverage-enhanced.ps1
+```
+
+#### Manual Coverage Check
 
 To manually check code coverage locally:
 
 ```powershell
 # Check coverage with default 80% threshold
-.\check-coverage.ps1
+.\check-coverage-enhanced.ps1
 
 # Check coverage with custom threshold
-.\check-coverage.ps1 -MinThreshold 85
+.\check-coverage-enhanced.ps1 -MinThreshold 85
 
 # Check coverage without regression check
-.\check-coverage.ps1 -SkipRegressionCheck
+.\check-coverage-enhanced.ps1 -SkipRegressionCheck
+
+# Update baseline (when coverage improves)
+.\check-coverage-enhanced.ps1 -UpdateBaseline
 ```
+
+#### Coverage Scope
+
+The enhanced system specifically targets:
+- **Controllers**: `src/MeetlyOmni.Api/Controllers/*.cs`
+- **Services**: `src/MeetlyOmni.Api/Service/*.cs`
+
+Other code (models, data access, etc.) is excluded from coverage requirements.
+
+#### Baseline Tracking
+
+- Coverage baseline is stored in `coverage/baseline/coverage.txt`
+- New commits cannot push if coverage drops below the baseline
+- Baseline can be updated when coverage improves
+
+For detailed information, see [Coverage Guide](./COVERAGE-GUIDE.md).
 
 ### Understanding Code Coverage
 
