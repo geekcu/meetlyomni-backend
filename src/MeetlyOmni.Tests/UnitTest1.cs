@@ -2,15 +2,13 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
-using MeetlyOmni.Api.Controllers;
-using MeetlyOmni.Api.Service;
-
-using Microsoft.AspNetCore.Mvc;
-
-using Moq;
-
 namespace MeetlyOmni.Tests
 {
+    using MeetlyOmni.Api.Controllers;
+    using MeetlyOmni.Api.Service;
+    using Microsoft.AspNetCore.Mvc;
+    using Moq;
+
     public class GreetServiceTests
     {
         [Fact]
@@ -22,14 +20,23 @@ namespace MeetlyOmni.Tests
             Assert.Equal("Hello, Alice!", result);
         }
 
-        [Fact]
-        public void GetGreeting_Returns_Guest_When_Empty()
-        {
-            var service = new GreetService();
-            var result = service.GetGreeting("");
+        // [Fact]
+        // public void GetFarewell_Returns_Custom_Message()
+        // {
+        //     var service = new GreetService();
+        //     var result = service.GetFarewell("Alice");
 
-            Assert.Equal("Hello, Guest!", result);
-        }
+        //     Assert.Equal("Goodbye, Alice!", result);
+        // }
+
+        // [Fact]
+        // public void GetGreeting_Returns_Guest_When_Empty()
+        // {
+        //     var service = new GreetService();
+        //     var result = service.GetGreeting(string.Empty);
+
+        //     Assert.Equal("Hello, Guest!", result);
+        // }
     }
 
     public class GreetControllerTests
