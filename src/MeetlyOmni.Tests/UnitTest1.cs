@@ -13,14 +13,14 @@ namespace MeetlyOmni.Tests
 
     public class GreetServiceTests
     {
-        //[Fact]
-        //public void GetGreeting_Returns_Custom_Message()
-        //{
+        // [Fact]
+        // public void GetGreeting_Returns_Custom_Message()
+        // {
         //    var service = new GreetService();
         //    var result = service.GetGreeting("Alice");
 
-        //    Assert.Equal("Hello, Alice!", result);
-        //}
+        // Assert.Equal("Hello, Alice!", result);
+        // }
 
         // [Fact]
         // public void GetFarewell_Returns_Custom_Message()
@@ -40,22 +40,22 @@ namespace MeetlyOmni.Tests
         }
     }
 
-    //public class GreetControllerTests
-    //{
+    // public class GreetControllerTests
+    // {
     //    [Fact]
     //    public void Greet_Returns_OkResult_With_Message()
     //    {
     //        var mockService = new Mock<IGreetService>();
     //        mockService.Setup(s => s.GetGreeting("Bob")).Returns("Hello, Bob!");
 
-    //        var controller = new GreetController(mockService.Object);
+    // var controller = new GreetController(mockService.Object);
     //        var result = controller.Greet("Bob") as OkObjectResult;
 
-    //        Assert.NotNull(result);
+    // Assert.NotNull(result);
     //        Assert.Equal(200, result.StatusCode);
 
-    //        var value = result.Value?.ToString();
+    // var value = result.Value?.ToString();
     //        Assert.Contains("Hello, Bob!", value);
     //    }
-    //}
+    // }
 }
