@@ -29,4 +29,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <!-- Coverlet configuration for targeting Controllers and Services -->
+  <PropertyGroup>
+    <CoverletCollectorEnabled>true</CoverletCollectorEnabled>
+  </PropertyGroup>
+
 </Project>

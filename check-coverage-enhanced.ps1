@@ -22,7 +22,7 @@ if (-not (Test-Path "coverage/baseline")) {
 
 # Run tests with coverage using XPlat Code Coverage
 Write-Host "Running tests with coverage for Controllers and Services..." -ForegroundColor Yellow
-dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal --filter "Category!=Integration"
+dotnet-coverage collect -o coverage.xml -f cobertura dotnet test --no-build
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Tests failed. Coverage check aborted." -ForegroundColor Red

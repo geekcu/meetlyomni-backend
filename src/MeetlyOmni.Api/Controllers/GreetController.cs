@@ -1,4 +1,8 @@
-﻿namespace MeetlyOmni.Api.Controllers
+﻿// <copyright file="GreetController.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
+// </copyright>
+
+namespace MeetlyOmni.Api.Controllers
 {
     using MeetlyOmni.Api.Service;
 
@@ -8,19 +12,18 @@
     [Route("[controller]")]
     public class GreetController : ControllerBase
     {
-        private readonly IGreetService _greetService;
+        private readonly IGreetService greetService;
 
         public GreetController(IGreetService greetService)
         {
-            _greetService = greetService;
+            this.greetService = greetService;
         }
 
         [HttpGet("{name}")]
         public IActionResult Greet(string name)
         {
-            var message = _greetService.GetGreeting(name);
-            return Ok(new { message });
+            var message = this.greetService.GetGreeting(name);
+            return this.Ok(new { message });
         }
     }
-
 }
