@@ -6,7 +6,9 @@ namespace MeetlyOmni.Tests
 {
     using MeetlyOmni.Api.Controllers;
     using MeetlyOmni.Api.Service;
+
     using Microsoft.AspNetCore.Mvc;
+
     using Moq;
 
     public class GreetServiceTests
@@ -26,7 +28,7 @@ namespace MeetlyOmni.Tests
         //     var service = new GreetService();
         //     var result = service.GetFarewell("Alice");
 
-        //     Assert.Equal("Goodbye, Alice!", result);
+        // Assert.Equal("Goodbye, Alice!", result);
         // }
 
         // [Fact]
@@ -35,7 +37,7 @@ namespace MeetlyOmni.Tests
         //     var service = new GreetService();
         //     var result = service.GetGreeting(string.Empty);
 
-        //     Assert.Equal("Hello, Guest!", result);
+        // Assert.Equal("Hello, Guest!", result);
         // }
     }
 

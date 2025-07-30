@@ -160,3 +160,5 @@ if (Test-Path $coverageFile) {
     Write-Host "No coverage file found" -ForegroundColor Red
     exit 1
 } 
+
+exit 0
