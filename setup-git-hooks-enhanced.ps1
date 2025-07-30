@@ -52,16 +52,7 @@ if (-not (Test-Path "coverage/baseline")) {
     New-Item -ItemType Directory -Path "coverage/baseline" -Force | Out-Null
 }
 
-# Create filter file for coverage (Controllers and Services only)
-$filterContent = @"
-[Filters]
-+[MeetlyOmni.Api.Controllers]*Controllers*
-+[MeetlyOmni.Api.Service]*Service*
--[MeetlyOmni.Api.Controllers]*.Program*
--[MeetlyOmni.Api.Service]*.Program*
-"@
-
-$filterContent | Out-File -FilePath "coverage/coverage.filter" -Encoding UTF8
+# Note: Filtering is now done via reportgenerator parameters instead of filter file
 
 # Run tests with coverage for specific assemblies
 Write-Host "Running tests with coverage for Controllers and Services..." -ForegroundColor Yellow
@@ -74,7 +65,7 @@ if ($LASTEXITCODE -ne 0) {
 
 # Generate coverage report
 Write-Host "Generating coverage report..." -ForegroundColor Yellow
-reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -filters:coverage/coverage.filter
+reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" -classfilters:"+*Controllers*;+*Service*"
 
 # Extract current coverage percentage
 $coverageFile = Get-ChildItem -Path "coverage" -Filter "coverage.cobertura.xml" -Recurse | Select-Object -First 1
@@ -153,14 +144,7 @@ echo "Running pre-push coverage check for Controllers and Services..."
 mkdir -p coverage
 mkdir -p coverage/baseline
 
-# Create filter file for coverage (Controllers and Services only)
-cat > coverage/coverage.filter << "EOF"
-[Filters]
-+[MeetlyOmni.Api.Controllers]*Controllers*
-+[MeetlyOmni.Api.Service]*Service*
--[MeetlyOmni.Api.Controllers]*.Program*
--[MeetlyOmni.Api.Service]*.Program*
-EOF
+# Note: Filtering is now done via reportgenerator parameters instead of filter file
 
 # Run tests with coverage for specific assemblies
 echo "Running tests with coverage for Controllers and Services..."
@@ -173,7 +157,7 @@ fi
 
 # Generate coverage report
 echo "Generating coverage report..."
-reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -filters:coverage/coverage.filter
+reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" -classfilters:"+*Controllers*;+*Service*"
 
 # Extract current coverage percentage
 COVERAGE_FILE=$(find coverage -name "coverage.cobertura.xml" | head -1)

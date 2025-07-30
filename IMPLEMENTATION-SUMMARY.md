@@ -98,13 +98,10 @@ Other code (models, data access, etc.) is excluded using coverage filters.
 
 ### 5. Configuration
 
-**Coverage Filter** (`coverage/coverage.filter`):
-```
-[Filters]
-+[MeetlyOmni.Api.Controllers]*Controllers*
-+[MeetlyOmni.Api.Service]*Service*
--[MeetlyOmni.Api.Controllers]*.Program*
--[MeetlyOmni.Api.Service]*.Program*
+**Coverage Filter** (via `reportgenerator` parameters):
+```bash
+-assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" 
+-classfilters:"+*Controllers*;+*Service*"
 ```
 
 **Test Filtering**:

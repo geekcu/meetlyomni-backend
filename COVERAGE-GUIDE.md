@@ -149,15 +149,14 @@ Other code (models, data access, etc.) is excluded from coverage requirements.
 
 ### Coverage Filter
 
-The system uses a filter file (`coverage/coverage.filter`) to include only Controllers and Services:
+The system uses `reportgenerator` assembly and class filters to include only Controllers and Services:
 
+```bash
+-assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" 
+-classfilters:"+*Controllers*;+*Service*"
 ```
-[Filters]
-+[MeetlyOmni.Api.Controllers]*Controllers*
-+[MeetlyOmni.Api.Service]*Service*
--[MeetlyOmni.Api.Controllers]*.Program*
--[MeetlyOmni.Api.Service]*.Program*
-```
+
+This ensures that only code in the Controllers and Services directories is included in coverage calculations.
 
 ### Threshold Configuration
 
