@@ -47,7 +47,7 @@ namespace MeetlyOmni.Tests
     // public class GreetControllerTests
     // {
     //    [Fact]
-    //[Trait("Category", "Unit")]
+    // [Trait("Category", "Unit")]
     //    public void Greet_Returns_OkResult_With_Message()
     //    {
     //        var mockService = new Mock<IGreetService>();
