@@ -30,6 +30,7 @@ namespace MeetlyOmni.Tests
 
             Assert.Equal("Goodbye, Alice!", result);
         }
+
         [Fact]
         public void GetGreeting_Returns_Guest_When_Empty()
         {
