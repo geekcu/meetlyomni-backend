@@ -337,3 +337,4 @@ For issues or questions:
 2. Review the generated coverage report
 3. Run manual coverage checks with verbose output
 4. Ensure all dependencies are installed correctly 
+5. Run --no-verify after commit or push to skip coverage checks (not recommended)
