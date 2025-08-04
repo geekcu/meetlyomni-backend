@@ -2,7 +2,7 @@
 # Pre-push Coverage Hook for Controllers and Services
 # This script runs before git push and enforces coverage requirements
 
-set -e
+set +e # Disable automatic exit on error for explicit handling
 
 echo "Running pre-push coverage check for Controllers and Services..."
 
@@ -26,11 +26,11 @@ echo "Generating coverage report..."
 reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" -classfilters:"+*Controllers*;+*Service*"
 
 # Extract current coverage percentage
-COVERAGE_FILE=$(find coverage -name "coverage.cobertura.xml" | head -1)
+COVERAGE_FILE=$(find coverage -name "coverage.cobertura.xml" -type f -print0 | xargs -0 ls -t | head -1)
 
 if [ -n "$COVERAGE_FILE" ]; then
     CURRENT_COVERAGE=$(grep -o 'line-rate="[0-9.]*"' "$COVERAGE_FILE" | grep -o '[0-9.]*' | head -1)
-    CURRENT_COVERAGE_PERCENT=$(echo "$CURRENT_COVERAGE * 100" | bc -l | cut -d. -f1)
+    CURRENT_COVERAGE_PERCENT=$(awk "BEGIN {printf \"%.0f\", $CURRENT_COVERAGE * 100}")
     
     echo "Current coverage for Controllers and Services: ${CURRENT_COVERAGE_PERCENT}%"
     
@@ -52,7 +52,14 @@ if [ -n "$COVERAGE_FILE" ]; then
     
     if [ -f "$BASELINE_FILE" ]; then
         BASELINE_COVERAGE=$(cat "$BASELINE_FILE")
-        BASELINE_COVERAGE_PERCENT=$(echo "$BASELINE_COVERAGE * 100" | bc -l | cut -d. -f1)
+        # Validate baseline is a valid number
+        if ! echo "$BASELINE_COVERAGE" | grep -qE '^[0-9]+\.?[0-9]*$'; then
+            echo "Warning: Invalid baseline coverage value. Creating new baseline..."
+            echo "$CURRENT_COVERAGE" > "$BASELINE_FILE"
+            echo "Initial baseline set to: ${CURRENT_COVERAGE_PERCENT}%"
+            exit 0
+        fi
+        BASELINE_COVERAGE_PERCENT=$(awk "BEGIN {printf \"%.0f\", $BASELINE_COVERAGE * 100}")
         echo "Baseline coverage: ${BASELINE_COVERAGE_PERCENT}%"
         
         if [ "$CURRENT_COVERAGE_PERCENT" -lt "$BASELINE_COVERAGE_PERCENT" ]; then

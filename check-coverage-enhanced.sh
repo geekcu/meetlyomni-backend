@@ -9,7 +9,6 @@ set -e
 MIN_THRESHOLD=80
 SKIP_REGRESSION_CHECK=false
 UPDATE_BASELINE=false
-TARGET_BRANCH="origin/main"
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -26,17 +25,12 @@ while [[ $# -gt 0 ]]; do
             UPDATE_BASELINE=true
             shift
             ;;
-        --target-branch)
-            TARGET_BRANCH="$2"
-            shift 2
-            ;;
         -h|--help)
             echo "Usage: $0 [OPTIONS]"
             echo "Options:"
             echo "  --min-threshold N        Minimum coverage threshold (default: 80)"
             echo "  --skip-regression-check  Skip regression check"
             echo "  --update-baseline        Update the baseline coverage"
-            echo "  --target-branch BRANCH   Target branch for comparison (default: origin/main)"
             echo "  -h, --help              Show this help message"
             exit 0
             ;;

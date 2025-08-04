@@ -5,8 +5,7 @@
 param(
     [int]$MinThreshold = 80,
     [switch]$SkipRegressionCheck,
-    [switch]$UpdateBaseline,
-    [string]$TargetBranch = "origin/main"
+    [switch]$UpdateBaseline
 )
 
 Write-Host "Running enhanced code coverage check for Controllers and Services..." -ForegroundColor Cyan
@@ -21,9 +20,9 @@ if (-not (Test-Path "coverage/baseline")) {
     New-Item -ItemType Directory -Path "coverage/baseline" -Force | Out-Null
 }
 
-# Run tests with coverage using dotnet-coverage
+# Run tests with coverage using XPlat Code Coverage
 Write-Host "Running tests with coverage for Controllers and Services..." -ForegroundColor Yellow
-dotnet-coverage collect -o coverage.xml -f cobertura dotnet test --no-build
+dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal --filter "Category!=Integration"
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Tests failed. Coverage check aborted." -ForegroundColor Red
@@ -32,64 +31,31 @@ if ($LASTEXITCODE -ne 0) {
 
 # Generate coverage report
 Write-Host "Generating coverage report..." -ForegroundColor Yellow
-reportgenerator -reports:coverage.xml -targetdir:coverage/report -reporttypes:Html
+reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" -classfilters:"+*Controllers*;+*Service*"
 
 # Extract current coverage percentage for Controllers and Services only
-$coverageFile = "coverage.xml"
+$coverageFile = Get-ChildItem -Path "coverage" -Filter "coverage.cobertura.xml" -Recurse | Select-Object -First 1
+if ($coverageFile) {
+    $coverageFile = $coverageFile.FullName
+}
 if (Test-Path $coverageFile) {
-    $content = Get-Content $coverageFile
-    
-    # Find all Controllers and Services classes
-    $controllerServiceClasses = $content | Select-String 'class.*name="([^"]*\.(Controllers|Service)\.[^"]*)"' | ForEach-Object { $_.Matches[0].Groups[1].Value }
-    
-    if ($controllerServiceClasses.Count -eq 0) {
-        Write-Host "No Controllers or Services found in coverage data" -ForegroundColor Red
-        exit 1
-    }
-    
-    Write-Host "Found Controllers and Services classes: $($controllerServiceClasses -join ', ')" -ForegroundColor Cyan
+    # Use PowerShell's native XML parsing capabilities
+    [xml]$coverageXml = Get-Content $coverageFile
     
     # Calculate coverage for Controllers and Services only
     $totalLines = 0
     $coveredLines = 0
     
-    foreach ($class in $controllerServiceClasses) {
-        Write-Host "Processing class: $class" -ForegroundColor Yellow
-        
-        # Find the class section in the XML
-        $classStartIndex = -1
-        for ($i = 0; $i -lt $content.Count; $i++) {
-            if ($content[$i] -match "class.*name=`"$class`"") {
-                $classStartIndex = $i
-                break
-            }
-        }
-        
-        if ($classStartIndex -ge 0) {
-            # Find the lines section for this class
-            $linesStartIndex = -1
-            $linesEndIndex = -1
-            
-            for ($i = $classStartIndex; $i -lt $content.Count; $i++) {
-                if ($content[$i] -match '<lines>') {
-                    $linesStartIndex = $i
-                }
-                if ($content[$i] -match '</lines>') {
-                    $linesEndIndex = $i
-                    break
-                }
-            }
-            
-            if ($linesStartIndex -ge 0 -and $linesEndIndex -ge 0) {
-                $linesSection = $content[($linesStartIndex + 1)..($linesEndIndex - 1)]
+    # Process all packages and their classes
+    foreach ($package in $coverageXml.coverage.packages.package) {
+        foreach ($class in $package.classes.class) {
+            if ($class.name -match '\.(Controllers|Service)\.') {
+                Write-Host "Processing class: $($class.name)" -ForegroundColor Yellow
                 
-                foreach ($line in $linesSection) {
-                    if ($line -match '<line number="([0-9]+)" hits="([0-9]+)"') {
-                        $totalLines++
-                        $hits = [int]$Matches[2]
-                        if ($hits -gt 0) {
-                            $coveredLines++
-                        }
+                foreach ($line in $class.lines.line) {
+                    $totalLines++
+                    if ([int]$line.hits -gt 0) {
+                        $coveredLines++
                     }
                 }
             }

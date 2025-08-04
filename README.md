@@ -168,10 +168,7 @@ For coverage checking to work, ensure you have the required tools installed:
 ```
 
 Or install manually:
-1. **XPlat Code Coverage** package:
-   ```bash
-   dotnet tool install -g dotnet-coverage
-   ```
+1. **Coverage collection** is handled by the XPlat Code Coverage collector included with .NET SDK (no separate installation needed)
 
 2. **ReportGenerator** tool:
    ```bash

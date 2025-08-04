@@ -95,8 +95,7 @@ if ($coverageFile) {
         $baselineCoverage = 0
         
         if (Test-Path $baselineFile) {
-            $baselineCoverage = [double](Get-Content $baselineFile)
-            $baselineCoveragePercent = [math]::Round($baselineCoverage * 100)
+            $baselineCoveragePercent = [int](Get-Content $baselineFile)
             Write-Host "Baseline coverage: ${baselineCoveragePercent}%" -ForegroundColor Cyan
             
             if ($currentCoveragePercent -lt $baselineCoveragePercent) {
@@ -111,7 +110,7 @@ if ($coverageFile) {
             }
         } else {
             Write-Host "No baseline found. Creating initial baseline..." -ForegroundColor Yellow
-            $currentCoverage | Out-File -FilePath $baselineFile -Encoding ASCII
+            $currentCoveragePercent | Out-File -FilePath $baselineFile -Encoding ASCII
             Write-Host "Initial baseline set to: ${currentCoveragePercent}%" -ForegroundColor Green
         }
         
@@ -137,6 +136,13 @@ $prePushContentUnix = @'
 # This script runs before git push and enforces coverage requirements
 
 set -e
+
+# Check for required dependencies
+if ! command -v bc &> /dev/null; then
+    echo "Error: 'bc' calculator is required but not installed."
+    echo "Please install bc using your package manager (e.g., apt-get install bc)"
+    exit 1
+fi
 
 echo "Running pre-push coverage check for Controllers and Services..."
 
@@ -185,8 +191,7 @@ if [ -n "$COVERAGE_FILE" ]; then
     BASELINE_COVERAGE=0
     
     if [ -f "$BASELINE_FILE" ]; then
-        BASELINE_COVERAGE=$(cat "$BASELINE_FILE")
-        BASELINE_COVERAGE_PERCENT=$(echo "$BASELINE_COVERAGE * 100" | bc -l | cut -d. -f1)
+        BASELINE_COVERAGE_PERCENT=$(cat "$BASELINE_FILE")
         echo "Baseline coverage: ${BASELINE_COVERAGE_PERCENT}%"
         
         if [ "$CURRENT_COVERAGE_PERCENT" -lt "$BASELINE_COVERAGE_PERCENT" ]; then
@@ -202,7 +207,7 @@ if [ -n "$COVERAGE_FILE" ]; then
         fi
     else
         echo "No baseline found. Creating initial baseline..."
-        echo "$CURRENT_COVERAGE" > "$BASELINE_FILE"
+        echo "$CURRENT_COVERAGE_PERCENT" > "$BASELINE_FILE"
         echo "Initial baseline set to: ${CURRENT_COVERAGE_PERCENT}%"
     fi
     
