@@ -30,7 +30,7 @@ echo "Building solution..."
 dotnet build MeetlyOmni.sln --no-restore || exit 1
 
 echo "Running tests..."
-dotnet test MeetlyOmni.sln --no-build --filter "Category=Unit" || exit 1
+dotnet test MeetlyOmni.sln --no-build --filter "Category!=Integration" || exit 1
 '@
 
 # Create pre-push hook content for Windows (PowerShell)

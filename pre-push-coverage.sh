@@ -2,7 +2,7 @@
 # Pre-push Coverage Hook for Controllers and Services
 # This script runs before git push and enforces coverage requirements
 
-set +e # Disable automatic exit on error for explicit handling
+set -e
 
 echo "Running pre-push coverage check for Controllers and Services..."
 
@@ -10,11 +10,9 @@ echo "Running pre-push coverage check for Controllers and Services..."
 mkdir -p coverage
 mkdir -p coverage/baseline
 
-# Note: Filtering is now done via reportgenerator parameters instead of filter file
-
 # Run tests with coverage for specific assemblies
 echo "Running tests with coverage for Controllers and Services..."
-dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal --filter "Category=Unit"
+dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal --filter "Category!=Integration"
 
 if [ $? -ne 0 ]; then
     echo "Tests failed. Push blocked."
@@ -25,13 +23,41 @@ fi
 echo "Generating coverage report..."
 reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" -classfilters:"+*Controllers*;+*Service*"
 
-# Extract current coverage percentage
-COVERAGE_FILE=$(find coverage -name "coverage.cobertura.xml" -type f -print0 | xargs -0 ls -t | head -1)
+# Extract current coverage percentage for Controllers and Services only
+COVERAGE_FILE=$(find coverage -name "coverage.cobertura.xml" | head -1)
 
 if [ -n "$COVERAGE_FILE" ]; then
-    CURRENT_COVERAGE=$(grep -o 'line-rate="[0-9.]*"' "$COVERAGE_FILE" | grep -o '[0-9.]*' | head -1)
-    CURRENT_COVERAGE_PERCENT=$(awk "BEGIN {printf \"%.0f\", $CURRENT_COVERAGE * 100}")
+    # Calculate coverage for Controllers and Services only using XML parsing
+    TOTAL_LINES=0
+    COVERED_LINES=0
     
+    # Use xmllint to parse XML and extract coverage data for Controllers and Services
+    while IFS= read -r line; do
+        if [[ $line =~ class.*name=.*\.(Controllers|Service)\. ]]; then
+            # Extract line information for this class
+            while IFS= read -r class_line; do
+                if [[ $class_line =~ line.*number=.*hits= ]]; then
+                    TOTAL_LINES=$((TOTAL_LINES + 1))
+                    if [[ $class_line =~ hits=\"([0-9]+)\" ]] && [ "${BASH_REMATCH[1]}" -gt 0 ]; then
+                        COVERED_LINES=$((COVERED_LINES + 1))
+                    fi
+                fi
+            done < <(xmllint --xpath "//class[@name='$line']//line" "$COVERAGE_FILE" 2>/dev/null || echo "")
+        fi
+    done < <(xmllint --xpath "//class/@name" "$COVERAGE_FILE" 2>/dev/null | grep -o 'name="[^"]*"' | grep -E '\.(Controllers|Service)\.' || echo "")
+    
+    if [ "$TOTAL_LINES" -eq 0 ]; then
+        echo "No lines found in Controllers and Services"
+        echo "Push blocked due to missing coverage data."
+        exit 1
+    fi
+    
+    # Calculate percentage using awk for better precision
+    CURRENT_COVERAGE=$(echo "scale=4; $COVERED_LINES / $TOTAL_LINES" | bc -l)
+    CURRENT_COVERAGE_PERCENT=$(echo "$CURRENT_COVERAGE * 100" | bc -l | cut -d. -f1)
+    
+    echo "Total lines in Controllers and Services: $TOTAL_LINES"
+    echo "Covered lines in Controllers and Services: $COVERED_LINES"
     echo "Current coverage for Controllers and Services: ${CURRENT_COVERAGE_PERCENT}%"
     
     # Check minimum threshold (80%)
@@ -59,7 +85,7 @@ if [ -n "$COVERAGE_FILE" ]; then
             echo "Initial baseline set to: ${CURRENT_COVERAGE_PERCENT}%"
             exit 0
         fi
-        BASELINE_COVERAGE_PERCENT=$(awk "BEGIN {printf \"%.0f\", $BASELINE_COVERAGE * 100}")
+        BASELINE_COVERAGE_PERCENT=$(echo "$BASELINE_COVERAGE * 100" | bc -l | cut -d. -f1)
         echo "Baseline coverage: ${BASELINE_COVERAGE_PERCENT}%"
         
         if [ "$CURRENT_COVERAGE_PERCENT" -lt "$BASELINE_COVERAGE_PERCENT" ]; then
