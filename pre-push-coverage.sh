@@ -14,7 +14,7 @@ mkdir -p coverage/baseline
 
 # Run tests with coverage for specific assemblies
 echo "Running tests with coverage for Controllers and Services..."
-dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal --filter "Category!=Integration"
+dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal --filter "Category=Unit"
 
 if [ $? -ne 0 ]; then
     echo "Tests failed. Push blocked."
