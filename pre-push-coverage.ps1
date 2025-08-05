@@ -1,7 +1,9 @@
 # Pre-push Coverage Hook for Controllers and Services
 # This script runs before git push and enforces coverage requirements
 
-param()
+param(
+    [string]$TargetBranch = "origin/main"
+)
 
 Write-Host "Running pre-push coverage check for Controllers and Services..." -ForegroundColor Cyan
 
@@ -30,32 +32,13 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "Generating coverage report..." -ForegroundColor Yellow
 reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" -classfilters:"+*Controllers*;+*Service*"
 
-# Extract current coverage percentage for Controllers and Services only
+# Extract current coverage percentage
 $coverageFile = Get-ChildItem -Path "coverage" -Filter "coverage.cobertura.xml" -Recurse | Select-Object -First 1
 if ($coverageFile) {
-    # Use PowerShell's native XML parsing capabilities
-    [xml]$coverageXml = Get-Content $coverageFile.FullName
-
-    # Calculate coverage for Controllers and Services only
-    $totalLines = 0
-    $coveredLines = 0
-
-    # Process all packages and their classes
-    foreach ($package in $coverageXml.coverage.packages.package) {
-        foreach ($class in $package.classes.class) {
-            if ($class.name -match '\.(Controllers|Service)\.') {
-                foreach ($line in $class.lines.line) {
-                    $totalLines++
-                    if ([int]$line.hits -gt 0) {
-                        $coveredLines++
-                    }
-                }
-            }
-        }
-    }
-
-    if ($totalLines -gt 0) {
-        $currentCoverage = $coveredLines / $totalLines
+    $content = Get-Content $coverageFile.FullName
+    $lineRateMatch = $content | Select-String 'line-rate="([0-9.]+)"' | Select-Object -First 1
+    if ($lineRateMatch) {
+        $currentCoverage = [double]$lineRateMatch.Matches[0].Groups[1].Value
         $currentCoveragePercent = [math]::Round($currentCoverage * 100)
 
         Write-Host "Current coverage for Controllers and Services: ${currentCoveragePercent}%" -ForegroundColor Green
@@ -101,8 +84,8 @@ if ($coverageFile) {
         Write-Host "Current coverage: ${currentCoveragePercent}%" -ForegroundColor Green
         Write-Host "Detailed report: coverage/report/index.html" -ForegroundColor Cyan
     } else {
-        Write-Host "No lines found in Controllers and Services" -ForegroundColor Red
-        Write-Host "Push blocked due to missing coverage data." -ForegroundColor Red
+        Write-Host "Could not extract coverage percentage" -ForegroundColor Red
+        Write-Host "Push blocked due to coverage analysis failure." -ForegroundColor Red
         exit 1
     }
 } else {

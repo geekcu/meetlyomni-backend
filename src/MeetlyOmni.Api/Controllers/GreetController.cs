@@ -2,28 +2,28 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-using MeetlyOmni.Api.Service;
-
-using Microsoft.AspNetCore.Mvc;
-
 namespace MeetlyOmni.Api.Controllers
 {
+    using MeetlyOmni.Api.Service;
+
+    using Microsoft.AspNetCore.Mvc;
+
     [ApiController]
     [Route("api/[controller]")]
     public class GreetController : ControllerBase
     {
-        private readonly IGreetService _greetService;
+        private readonly IGreetService greetService;
 
         public GreetController(IGreetService greetService)
         {
-            _greetService = greetService;
+            this.greetService = greetService;
         }
 
         [HttpGet("hello")]
         public IActionResult Hello([FromQuery] string name)
         {
-            var message = _greetService.SayHello(name);
-            return Ok(new { message });
+            var message = this.greetService.SayHello(name);
+            return this.Ok(new { message });
         }
     }
 }

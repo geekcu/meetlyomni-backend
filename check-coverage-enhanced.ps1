@@ -5,7 +5,8 @@
 param(
     [int]$MinThreshold = 80,
     [switch]$SkipRegressionCheck,
-    [switch]$UpdateBaseline
+    [switch]$UpdateBaseline,
+    [string]$TargetBranch = "origin/main"
 )
 
 Write-Host "Running enhanced code coverage check for Controllers and Services..." -ForegroundColor Cyan

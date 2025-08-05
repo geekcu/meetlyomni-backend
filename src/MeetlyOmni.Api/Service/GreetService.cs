@@ -12,7 +12,10 @@ namespace MeetlyOmni.Api.Service
         public string SayHello(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
+            {
                 return "Hello, Guest!";
+            }
+
             return $"Hello, {name}!";
         }
     }

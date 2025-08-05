@@ -2,25 +2,27 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
-using MeetlyOmni.Api.Service;
-
 namespace MeetlyOmni.Unit.Tests
 {
+    using MeetlyOmni.Api.Service;
+
     public class GreetServiceTests
     {
-        private readonly GreetService _service = new();
+        private readonly GreetService service = new ();
 
         [Fact]
+        [Trait("Category", "Unit")]
         public void SayHello_WithName_ReturnsPersonalizedGreeting()
         {
-            var result = _service.SayHello("Alice");
+            var result = this.service.SayHello("Alice");
             Assert.Equal("Hello, Alice!", result);
         }
 
         [Fact]
+        [Trait("Category", "Unit")]
         public void SayHello_EmptyName_ReturnsGuestGreeting()
         {
-            var result = _service.SayHello("");
+            var result = this.service.SayHello(string.Empty);
             Assert.Equal("Hello, Guest!", result);
         }
     }
