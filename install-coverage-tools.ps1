@@ -31,5 +31,10 @@ try {
 
 Write-Host "`nCoverage tools installation completed!" -ForegroundColor Green
 Write-Host "You can now run coverage checks with:" -ForegroundColor Yellow
+<<<<<<< HEAD
 Write-Host "  .\check-coverage-enhanced.ps1" -ForegroundColor White
 Write-Host "  .\setup-git-hooks-enhanced.ps1" -ForegroundColor White 
+=======
+Write-Host "  .\check-coverage.ps1" -ForegroundColor White
+Write-Host "  .\setup-git-hooks.ps1" -ForegroundColor White 
+>>>>>>> 9652d65 (rebase:rebase to branch after hotfix)
