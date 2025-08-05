@@ -20,18 +20,18 @@ if (-not (Test-Path "coverage/baseline")) {
     New-Item -ItemType Directory -Path "coverage/baseline" -Force | Out-Null
 }
 
-# Run tests with coverage using XPlat Code Coverage
+# Run tests with coverage using XPlat Code Coverage (hide system output, keep user messages)
 Write-Host "Running tests with coverage for Controllers and Services..." -ForegroundColor Yellow
-dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal --filter "Category!=Integration"
+dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity quiet --filter "Category!=Integration" --logger "console;verbosity=quiet" --nologo --no-restore --no-build 2>$null
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Tests failed. Coverage check aborted." -ForegroundColor Red
     exit 1
 }
 
-# Generate coverage report
+# Generate coverage report (hide system output)
 Write-Host "Generating coverage report..." -ForegroundColor Yellow
-reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" -classfilters:"+*Controllers*;+*Service*"
+reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" -classfilters:"+*Controllers*;+*Service*" 2>$null
 
 # Extract current coverage percentage for Controllers and Services only
 $coverageFile = Get-ChildItem -Path "coverage" -Filter "coverage.cobertura.xml" -Recurse | Select-Object -First 1

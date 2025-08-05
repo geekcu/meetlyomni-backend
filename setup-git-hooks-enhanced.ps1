@@ -54,18 +54,18 @@ if (-not (Test-Path "coverage/baseline")) {
 
 # Note: Filtering is now done via reportgenerator parameters instead of filter file
 
-# Run tests with coverage for specific assemblies
+# Run tests with coverage for specific assemblies (hide system output, keep user messages)
 Write-Host "Running tests with coverage for Controllers and Services..." -ForegroundColor Yellow
-dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal --filter "Category=Unit"
+dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity quiet --filter "Category=Unit" --logger "console;verbosity=quiet" --nologo --no-restore --no-build 2>$null
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Tests failed. Push blocked." -ForegroundColor Red
     exit 1
 }
 
-# Generate coverage report
+# Generate coverage report (hide system output)
 Write-Host "Generating coverage report..." -ForegroundColor Yellow
-reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" -classfilters:"+*Controllers*;+*Service*"
+reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" -classfilters:"+*Controllers*;+*Service*" 2>$null
 
 # Extract current coverage percentage for Controllers and Services only
 $coverageFile = Get-ChildItem -Path "coverage" -Filter "coverage.cobertura.xml" -Recurse | Select-Object -First 1
@@ -167,18 +167,18 @@ echo "Running pre-push coverage check for Controllers and Services..."
 mkdir -p coverage
 mkdir -p coverage/baseline
 
-# Run tests with coverage for specific assemblies
+# Run tests with coverage for specific assemblies (hide system output, keep user messages)
 echo "Running tests with coverage for Controllers and Services..."
-dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal --filter "Category=Unit"
+dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity quiet --filter "Category=Unit" --logger "console;verbosity=quiet" --nologo --no-restore --no-build 2>/dev/null
 
 if [ $? -ne 0 ]; then
     echo "Tests failed. Push blocked."
     exit 1
 fi
 
-# Generate coverage report
+# Generate coverage report (hide system output)
 echo "Generating coverage report..."
-reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" -classfilters:"+*Controllers*;+*Service*"
+reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" -classfilters:"+*Controllers*;+*Service*" 2>/dev/null
 
 # Extract current coverage percentage for Controllers and Services only
 COVERAGE_FILE=$(find coverage -name "coverage.cobertura.xml" | head -1)
