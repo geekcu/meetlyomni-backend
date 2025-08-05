@@ -35,11 +35,11 @@ $coverageFile = Get-ChildItem -Path "coverage" -Filter "coverage.cobertura.xml" 
 if ($coverageFile) {
     # Use PowerShell's native XML parsing capabilities
     [xml]$coverageXml = Get-Content $coverageFile.FullName
-    
+
     # Calculate coverage for Controllers and Services only
     $totalLines = 0
     $coveredLines = 0
-    
+
     # Process all packages and their classes
     foreach ($package in $coverageXml.coverage.packages.package) {
         foreach ($class in $package.classes.class) {
@@ -53,13 +53,13 @@ if ($coverageFile) {
             }
         }
     }
-    
+
     if ($totalLines -gt 0) {
         $currentCoverage = $coveredLines / $totalLines
         $currentCoveragePercent = [math]::Round($currentCoverage * 100)
-        
+
         Write-Host "Current coverage for Controllers and Services: ${currentCoveragePercent}%" -ForegroundColor Green
-        
+
         # Check minimum threshold (80%)
         if ($currentCoveragePercent -lt 80) {
             Write-Host "Coverage below minimum threshold of 80%" -ForegroundColor Red
@@ -68,19 +68,19 @@ if ($coverageFile) {
             Write-Host "Push blocked due to insufficient coverage." -ForegroundColor Red
             exit 1
         }
-        
+
         # Check for regression against baseline
         Write-Host "Checking coverage regression..." -ForegroundColor Yellow
-        
+
         # Get baseline coverage
         $baselineFile = "coverage/baseline/coverage.txt"
         $baselineCoverage = 0
-        
+
         if (Test-Path $baselineFile) {
             $baselineCoverage = [double](Get-Content $baselineFile)
             $baselineCoveragePercent = [math]::Round($baselineCoverage * 100)
             Write-Host "Baseline coverage: ${baselineCoveragePercent}%" -ForegroundColor Cyan
-            
+
             if ($currentCoveragePercent -lt $baselineCoveragePercent) {
                 Write-Host "Coverage regression detected!" -ForegroundColor Red
                 Write-Host "Baseline: ${baselineCoveragePercent}%" -ForegroundColor Red
@@ -96,7 +96,7 @@ if ($coverageFile) {
             $currentCoverage | Out-File -FilePath $baselineFile -Encoding ASCII
             Write-Host "Initial baseline set to: ${currentCoveragePercent}%" -ForegroundColor Green
         }
-        
+
         Write-Host "Coverage check passed!" -ForegroundColor Green
         Write-Host "Current coverage: ${currentCoveragePercent}%" -ForegroundColor Green
         Write-Host "Detailed report: coverage/report/index.html" -ForegroundColor Cyan
