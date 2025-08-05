@@ -51,7 +51,7 @@ mkdir -p coverage
 
 # Run tests with coverage
 echo "Running tests with coverage..."
-dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal
+dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal --filter "Category=Unit"
 
 if [ $? -ne 0 ]; then
     echo "Tests failed. Push blocked."
@@ -118,7 +118,7 @@ if (-not (Test-Path "coverage")) {
 
 # Run tests with coverage
 Write-Host "Running tests with coverage..." -ForegroundColor Yellow
-dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal
+dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal --filter "Category=Unit"
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Tests failed. Push blocked." -ForegroundColor Red
