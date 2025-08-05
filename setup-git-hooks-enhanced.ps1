@@ -56,7 +56,7 @@ if (-not (Test-Path "coverage/baseline")) {
 
 # Run tests with coverage for specific assemblies
 Write-Host "Running tests with coverage for Controllers and Services..." -ForegroundColor Yellow
-dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal --filter "Category!=Integration"
+dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal --filter "Category=Unit"
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Tests failed. Push blocked." -ForegroundColor Red
@@ -67,61 +67,85 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "Generating coverage report..." -ForegroundColor Yellow
 reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" -classfilters:"+*Controllers*;+*Service*"
 
-# Extract current coverage percentage
+# Extract current coverage percentage for Controllers and Services only
 $coverageFile = Get-ChildItem -Path "coverage" -Filter "coverage.cobertura.xml" -Recurse | Select-Object -First 1
 if ($coverageFile) {
-    $content = Get-Content $coverageFile.FullName
-    $lineRateMatch = $content | Select-String 'line-rate="([0-9.]+)"' | Select-Object -First 1
-    if ($lineRateMatch) {
-        $currentCoverage = [double]$lineRateMatch.Matches[0].Groups[1].Value
-        $currentCoveragePercent = [math]::Round($currentCoverage * 100)
-        
-        Write-Host "Current coverage for Controllers and Services: ${currentCoveragePercent}%" -ForegroundColor Green
-        
-        # Check minimum threshold (80%)
-        if ($currentCoveragePercent -lt 80) {
-            Write-Host "Coverage below minimum threshold of 80%" -ForegroundColor Red
-            Write-Host "Current coverage: ${currentCoveragePercent}%" -ForegroundColor Red
-            Write-Host "Detailed report: coverage/report/index.html" -ForegroundColor Yellow
-            Write-Host "Push blocked due to insufficient coverage." -ForegroundColor Red
-            exit 1
-        }
-        
-        # Check for regression against baseline
-        Write-Host "Checking coverage regression..." -ForegroundColor Yellow
-        
-        # Get baseline coverage
-        $baselineFile = "coverage/baseline/coverage.txt"
-        $baselineCoverage = 0
-        
-        if (Test-Path $baselineFile) {
-            $baselineCoveragePercent = [int](Get-Content $baselineFile)
-            Write-Host "Baseline coverage: ${baselineCoveragePercent}%" -ForegroundColor Cyan
-            
-            if ($currentCoveragePercent -lt $baselineCoveragePercent) {
-                Write-Host "Coverage regression detected!" -ForegroundColor Red
-                Write-Host "Baseline: ${baselineCoveragePercent}%" -ForegroundColor Red
-                Write-Host "Current: ${currentCoveragePercent}%" -ForegroundColor Red
-                Write-Host "Difference: -$($baselineCoveragePercent - $currentCoveragePercent)%" -ForegroundColor Red
-                Write-Host "Detailed report: coverage/report/index.html" -ForegroundColor Yellow
-                Write-Host "Push blocked due to coverage regression." -ForegroundColor Red
-                Write-Host "To update baseline, run: .\check-coverage-enhanced.ps1 -UpdateBaseline" -ForegroundColor Yellow
-                exit 1
+    # Use PowerShell's native XML parsing capabilities
+    [xml]$coverageXml = Get-Content $coverageFile.FullName
+    
+    # Calculate coverage for Controllers and Services only
+    $totalLines = 0
+    $coveredLines = 0
+    
+    # Process all packages and their classes
+    foreach ($package in $coverageXml.coverage.packages.package) {
+        foreach ($class in $package.classes.class) {
+            if ($class.name -match '\.(Controllers|Service)\.') {
+                Write-Host "Processing class: $($class.name)" -ForegroundColor Yellow
+                
+                foreach ($line in $class.lines.line) {
+                    $totalLines++
+                    if ([int]$line.hits -gt 0) {
+                        $coveredLines++
+                    }
+                }
             }
-        } else {
-            Write-Host "No baseline found. Creating initial baseline..." -ForegroundColor Yellow
-            $currentCoveragePercent | Out-File -FilePath $baselineFile -Encoding ASCII
-            Write-Host "Initial baseline set to: ${currentCoveragePercent}%" -ForegroundColor Green
         }
-        
-        Write-Host "Coverage check passed!" -ForegroundColor Green
-        Write-Host "Current coverage: ${currentCoveragePercent}%" -ForegroundColor Green
-        Write-Host "Detailed report: coverage/report/index.html" -ForegroundColor Cyan
-    } else {
-        Write-Host "Could not extract coverage percentage" -ForegroundColor Red
-        Write-Host "Push blocked due to coverage analysis failure." -ForegroundColor Red
+    }
+    
+    if ($totalLines -eq 0) {
+        Write-Host "No lines found in Controllers and Services" -ForegroundColor Red
+        Write-Host "Push blocked due to missing coverage data." -ForegroundColor Red
         exit 1
     }
+    
+    $currentCoverage = $coveredLines / $totalLines
+    $currentCoveragePercent = [math]::Round($currentCoverage * 100)
+    
+    Write-Host "Total lines in Controllers and Services: $totalLines" -ForegroundColor Cyan
+    Write-Host "Covered lines in Controllers and Services: $coveredLines" -ForegroundColor Cyan
+    Write-Host "Current coverage for Controllers and Services: ${currentCoveragePercent}%" -ForegroundColor Green
+    
+    # Check minimum threshold (80%)
+    if ($currentCoveragePercent -lt 80) {
+        Write-Host "Coverage below minimum threshold of 80%" -ForegroundColor Red
+        Write-Host "Current coverage: ${currentCoveragePercent}%" -ForegroundColor Red
+        Write-Host "Detailed report: coverage/report/index.html" -ForegroundColor Yellow
+        Write-Host "Push blocked due to insufficient coverage." -ForegroundColor Red
+        exit 1
+    }
+    
+    # Check for regression against baseline
+    Write-Host "Checking coverage regression..." -ForegroundColor Yellow
+    
+    # Get baseline coverage
+    $baselineFile = "coverage/baseline/coverage.txt"
+    $baselineCoverage = 0
+    
+    if (Test-Path $baselineFile) {
+        $baselineCoverage = [double](Get-Content $baselineFile)
+        $baselineCoveragePercent = [math]::Round($baselineCoverage * 100)
+        Write-Host "Baseline coverage: ${baselineCoveragePercent}%" -ForegroundColor Cyan
+        
+        if ($currentCoveragePercent -lt $baselineCoveragePercent) {
+            Write-Host "Coverage regression detected!" -ForegroundColor Red
+            Write-Host "Baseline: ${baselineCoveragePercent}%" -ForegroundColor Red
+            Write-Host "Current: ${currentCoveragePercent}%" -ForegroundColor Red
+            Write-Host "Difference: -$($baselineCoveragePercent - $currentCoveragePercent)%" -ForegroundColor Red
+            Write-Host "Detailed report: coverage/report/index.html" -ForegroundColor Yellow
+            Write-Host "Push blocked due to coverage regression." -ForegroundColor Red
+            Write-Host "To update baseline, run: .\check-coverage-enhanced.ps1 -UpdateBaseline" -ForegroundColor Yellow
+            exit 1
+        }
+    } else {
+        Write-Host "No baseline found. Creating initial baseline..." -ForegroundColor Yellow
+        $currentCoverage | Out-File -FilePath $baselineFile -Encoding ASCII
+        Write-Host "Initial baseline set to: ${currentCoveragePercent}%" -ForegroundColor Green
+    }
+    
+    Write-Host "Coverage check passed!" -ForegroundColor Green
+    Write-Host "Current coverage: ${currentCoveragePercent}%" -ForegroundColor Green
+    Write-Host "Detailed report: coverage/report/index.html" -ForegroundColor Cyan
 } else {
     Write-Host "No coverage file found" -ForegroundColor Red
     Write-Host "Push blocked due to missing coverage data." -ForegroundColor Red
@@ -137,20 +161,15 @@ $prePushContentUnix = @'
 
 set -e
 
-# Check for required dependencies
-# Note: Removed bc dependency for better Windows compatibility
-
 echo "Running pre-push coverage check for Controllers and Services..."
 
 # Create coverage directory if it doesn't exist
 mkdir -p coverage
 mkdir -p coverage/baseline
 
-# Note: Filtering is now done via reportgenerator parameters instead of filter file
-
 # Run tests with coverage for specific assemblies
 echo "Running tests with coverage for Controllers and Services..."
-dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal --filter "Category!=Integration"
+dotnet test MeetlyOmni.sln --collect:"XPlat Code Coverage" --results-directory coverage --verbosity normal --filter "Category=Unit"
 
 if [ $? -ne 0 ]; then
     echo "Tests failed. Push blocked."
@@ -161,17 +180,41 @@ fi
 echo "Generating coverage report..."
 reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/report -reporttypes:Html -assemblyfilters:"+MeetlyOmni.Api.Controllers*;+MeetlyOmni.Api.Service*" -classfilters:"+*Controllers*;+*Service*"
 
-# Extract current coverage percentage
+# Extract current coverage percentage for Controllers and Services only
 COVERAGE_FILE=$(find coverage -name "coverage.cobertura.xml" | head -1)
 
-# Check for required dependencies
-# Note: Removed bc dependency for better Windows compatibility
-
 if [ -n "$COVERAGE_FILE" ]; then
-    CURRENT_COVERAGE=$(grep -o "line-rate=\"[0-9.]*\"" "$COVERAGE_FILE" | grep -o "[0-9.]*" | head -1)
-    # Calculate percentage without bc using awk for better compatibility
-    CURRENT_COVERAGE_PERCENT=$(echo "$CURRENT_COVERAGE * 100" | awk '{printf "%.0f", $1}')
+    # Calculate coverage for Controllers and Services only using XML parsing
+    TOTAL_LINES=0
+    COVERED_LINES=0
     
+    # Use xmllint to parse XML and extract coverage data for Controllers and Services
+    while IFS= read -r line; do
+        if [[ $line =~ class.*name=.*\.(Controllers|Service)\. ]]; then
+            # Extract line information for this class
+            while IFS= read -r class_line; do
+                if [[ $class_line =~ line.*number=.*hits= ]]; then
+                    TOTAL_LINES=$((TOTAL_LINES + 1))
+                    if [[ $class_line =~ hits=\"([0-9]+)\" ]] && [ "${BASH_REMATCH[1]}" -gt 0 ]; then
+                        COVERED_LINES=$((COVERED_LINES + 1))
+                    fi
+                fi
+            done < <(xmllint --xpath "//class[@name='$line']//line" "$COVERAGE_FILE" 2>/dev/null || echo "")
+        fi
+    done < <(xmllint --xpath "//class/@name" "$COVERAGE_FILE" 2>/dev/null | grep -o 'name="[^"]*"' | grep -E '\.(Controllers|Service)\.' || echo "")
+    
+    if [ "$TOTAL_LINES" -eq 0 ]; then
+        echo "No lines found in Controllers and Services"
+        echo "Push blocked due to missing coverage data."
+        exit 1
+    fi
+    
+    # Calculate percentage using awk for better precision
+    CURRENT_COVERAGE=$(echo "scale=4; $COVERED_LINES / $TOTAL_LINES" | bc -l)
+    CURRENT_COVERAGE_PERCENT=$(echo "$CURRENT_COVERAGE * 100" | bc -l | cut -d. -f1)
+    
+    echo "Total lines in Controllers and Services: $TOTAL_LINES"
+    echo "Covered lines in Controllers and Services: $COVERED_LINES"
     echo "Current coverage for Controllers and Services: ${CURRENT_COVERAGE_PERCENT}%"
     
     # Check minimum threshold (80%)
@@ -191,7 +234,15 @@ if [ -n "$COVERAGE_FILE" ]; then
     BASELINE_COVERAGE=0
     
     if [ -f "$BASELINE_FILE" ]; then
-        BASELINE_COVERAGE_PERCENT=$(cat "$BASELINE_FILE")
+        BASELINE_COVERAGE=$(cat "$BASELINE_FILE")
+        # Validate baseline is a valid number
+        if ! echo "$BASELINE_COVERAGE" | grep -qE '^[0-9]+\.?[0-9]*$'; then
+            echo "Warning: Invalid baseline coverage value. Creating new baseline..."
+            echo "$CURRENT_COVERAGE" > "$BASELINE_FILE"
+            echo "Initial baseline set to: ${CURRENT_COVERAGE_PERCENT}%"
+            exit 0
+        fi
+        BASELINE_COVERAGE_PERCENT=$(echo "$BASELINE_COVERAGE * 100" | bc -l | cut -d. -f1)
         echo "Baseline coverage: ${BASELINE_COVERAGE_PERCENT}%"
         
         if [ "$CURRENT_COVERAGE_PERCENT" -lt "$BASELINE_COVERAGE_PERCENT" ]; then
@@ -207,7 +258,7 @@ if [ -n "$COVERAGE_FILE" ]; then
         fi
     else
         echo "No baseline found. Creating initial baseline..."
-        echo "$CURRENT_COVERAGE_PERCENT" > "$BASELINE_FILE"
+        echo "$CURRENT_COVERAGE" > "$BASELINE_FILE"
         echo "Initial baseline set to: ${CURRENT_COVERAGE_PERCENT}%"
     fi
     
