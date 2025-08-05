@@ -13,6 +13,7 @@ namespace MeetlyOmni.Tests
 
     public class GreetServiceTests
     {
+<<<<<<< HEAD
         [Fact]
         public void GetGreeting_Returns_Custom_Message()
         {
@@ -25,9 +26,16 @@ namespace MeetlyOmni.Tests
         //[Fact]
         //public void GetFarewell_Returns_Custom_Message()
         //{
+=======
+        // [Fact]
+        // [Trait("Category", "Unit")]
+        // public void GetGreeting_Returns_Custom_Message()
+        // {
+>>>>>>> 30a5372 (update setup hook)
         //    var service = new GreetService();
         //    var result = service.GetFarewell("Alice");
 
+<<<<<<< HEAD
         //    Assert.Equal("Goodbye, Alice!", result);
         //}
 
@@ -58,5 +66,9 @@ namespace MeetlyOmni.Tests
             var value = result.Value?.ToString();
             Assert.Contains("Hello, Bob!", value);
         }
+=======
+        // Assert.Equal("Hello, Alice!", result);
+        // }
+>>>>>>> 30a5372 (update setup hook)
     }
 }

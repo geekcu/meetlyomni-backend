@@ -168,6 +168,13 @@ reportgenerator -reports:coverage/*/coverage.cobertura.xml -targetdir:coverage/r
 # Extract current coverage percentage
 COVERAGE_FILE=$(find coverage -name "coverage.cobertura.xml" | head -1)
 
+# Check for required dependencies
+if ! command -v bc &> /dev/null; then
+    echo "Error: 'bc' calculator is required but not installed."
+    echo "Please install bc using your package manager (e.g., apt-get install bc)"
+    exit 1
+fi
+
 if [ -n "$COVERAGE_FILE" ]; then
     CURRENT_COVERAGE=$(grep -o "line-rate=\"[0-9.]*\"" "$COVERAGE_FILE" | grep -o "[0-9.]*" | head -1)
     CURRENT_COVERAGE_PERCENT=$(echo "$CURRENT_COVERAGE * 100" | bc -l | cut -d. -f1)
