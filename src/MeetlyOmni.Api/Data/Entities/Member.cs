@@ -2,25 +2,17 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
+using Microsoft.AspNetCore.Identity;
+
 namespace MeetlyOmni.Api.Data.Entities
 {
     using MeetlyOmni.Api.Common.Enums.Members;
 
-    public class Member
+    public class Member : IdentityUser<Guid>
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
-
         public Guid OrgId { get; set; }
 
         public int LocalMemberNumber { get; set; }
-
-        public string Email { get; set; } = string.Empty;
-
-        public string PasswordHash { get; set; } = string.Empty;
-
-        public string? Nickname { get; set; }
-
-        public string? Phone { get; set; }
 
         public string LanguagePref { get; set; } = "en";
 

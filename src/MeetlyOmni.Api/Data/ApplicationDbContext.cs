@@ -6,16 +6,15 @@ namespace MeetlyOmni.Api.Data
 {
     using MeetlyOmni.Api.Data.Entities;
 
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
 
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<Member, ApplicationRole, Guid>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
-
-        public DbSet<Member> Members { get; set; }
 
         public DbSet<Organization> Organizations { get; set; }
 

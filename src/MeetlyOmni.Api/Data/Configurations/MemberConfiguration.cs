@@ -15,8 +15,9 @@ namespace MeetlyOmni.Api.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Member> builder)
         {
-            // Primary key - UUID
-            builder.HasKey(m => m.Id);
+            // 设置表名为 Members 而不是默认的 AspNetUsers
+            builder.ToTable("Members");
+
             builder.Property(m => m.Id)
                    .HasDefaultValueSql("gen_random_uuid()")
                    .IsRequired();
@@ -25,9 +26,11 @@ namespace MeetlyOmni.Api.Data.Configurations
             builder.Property(m => m.LocalMemberNumber).IsRequired();
 
             builder.ConfigureString(m => m.Email, maxLength: 255);
+
             builder.ConfigureString(m => m.PasswordHash, maxLength: 255);
-            builder.ConfigureString(m => m.Nickname, maxLength: 100, isRequired: false);
-            builder.ConfigureString(m => m.Phone, maxLength: 20, isRequired: false);
+            builder.Property(m => m.UserName)
+                .HasMaxLength(100);
+            builder.ConfigureString(m => m.PhoneNumber, maxLength: 20, isRequired: false);
             builder.ConfigureString(m => m.LanguagePref, maxLength: 10);
 
             builder.ConfigureJsonbList(m => m.Tags);
