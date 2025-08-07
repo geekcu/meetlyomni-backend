@@ -19,8 +19,8 @@ public static class ApplicationDbInitializer
         // 系统核心角色
         var roles = new[]
         {
-            new { Name = RoleConstants.Admin, Description = "公司管理员 - 拥有完整权限" },
-            new { Name = RoleConstants.Employee, Description = "公司员工 - 拥有有限权限" },
+                new { Name = RoleConstants.Admin, Description = "公司管理员 - 拥有完整权限" },
+                new { Name = RoleConstants.Employee, Description = "公司员工 - 拥有有限权限" },
         };
 
         foreach (var roleInfo in roles)
