@@ -4,22 +4,14 @@
 
 using MeetlyOmni.Api.Common.Enums.Members;
 
-namespace MeetlyOmni.Api.Data.Entities;
-public class Member
-{
-    public Guid Id { get; set; } = Guid.NewGuid();
+using Microsoft.AspNetCore.Identity;
 
+namespace MeetlyOmni.Api.Data.Entities;
+public class Member : IdentityUser<Guid>
+{
     public Guid OrgId { get; set; }
 
     public int LocalMemberNumber { get; set; }
-
-    public string Email { get; set; } = string.Empty;
-
-    public string PasswordHash { get; set; } = string.Empty;
-
-    public string? Nickname { get; set; }
-
-    public string? Phone { get; set; }
 
     public string LanguagePref { get; set; } = "en";
 
