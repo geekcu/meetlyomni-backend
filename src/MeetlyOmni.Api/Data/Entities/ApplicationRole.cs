@@ -11,21 +11,13 @@ namespace MeetlyOmni.Api.Data.Entities
         public ApplicationRole()
             : base()
         {
-            this.CreatedAt = DateTimeOffset.UtcNow;
-            this.UpdatedAt = DateTimeOffset.UtcNow;
         }
 
         public ApplicationRole(string roleName)
             : base(roleName)
         {
-            this.CreatedAt = DateTimeOffset.UtcNow;
-            this.UpdatedAt = DateTimeOffset.UtcNow;
         }
 
         public string? Description { get; set; }
-
-        public DateTimeOffset CreatedAt { get; set; }
-
-        public DateTimeOffset UpdatedAt { get; set; }
     }
 }
