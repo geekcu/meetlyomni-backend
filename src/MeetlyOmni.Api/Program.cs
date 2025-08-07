@@ -2,7 +2,6 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-using MeetlyOmni.Api.Common;
 using MeetlyOmni.Api.Data;
 using MeetlyOmni.Api.Data.Entities;
 using MeetlyOmni.Api.Mapping;
@@ -76,15 +75,6 @@ using (var scope = app.Services.CreateScope())
 
         // 确保角色存在
         await ApplicationDbInitializer.SeedRolesAsync(services);
-        logger.LogInformation("Role seeding completed.");
-
-        // 创建默认管理员用户（仅在开发环境）
-        if (app.Environment.IsDevelopment())
-        {
-            await ApplicationDbInitializer.SeedDefaultAdminAsync(services);
-            logger.LogInformation("Default admin user seeding completed.");
-        }
-
         logger.LogInformation("Database initialization completed successfully.");
     }
     catch (Exception ex)

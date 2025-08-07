@@ -13,7 +13,7 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
 {
     public void Configure(EntityTypeBuilder<Member> builder)
     {
-        // 设置表名为 Members 而不是默认的 AspNetUsers
+        // using Members instead of AspNetUsers
         builder.ToTable("Members");
 
         builder.Property(m => m.Id)
