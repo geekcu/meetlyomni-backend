@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace MeetlyOmni.Api.Data;
-
 public static class ApplicationDbInitializer
 {
     public static async Task SeedRolesAsync(IServiceProvider serviceProvider)
