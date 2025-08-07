@@ -15,7 +15,7 @@ namespace MeetlyOmni.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20250807065609_delete_global_admin")]
-    partial class delete_global_admin
+    partial class Delete_global_admin
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

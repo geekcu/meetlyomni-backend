@@ -31,7 +31,7 @@ namespace MeetlyOmni.Api.Data
 
                     var role = new ApplicationRole(roleInfo.Name)
                     {
-                        Description = roleInfo.Description
+                        Description = roleInfo.Description,
                     };
 
                     var result = await roleManager.CreateAsync(role);
@@ -42,7 +42,8 @@ namespace MeetlyOmni.Api.Data
                     }
                     else
                     {
-                        logger.LogError("Failed to create role {RoleName}: {Errors}",
+                        logger.LogError(
+                            "Failed to create role {RoleName}: {Errors}",
                             roleInfo.Name, string.Join(", ", result.Errors.Select(e => e.Description)));
                     }
                 }
@@ -55,5 +56,7 @@ namespace MeetlyOmni.Api.Data
     }
 
     // 用于 ILogger 注入上下文
-    public class ApplicationDbInitializerLog { }
+    public class ApplicationDbInitializerLog
+    {
+    }
 }

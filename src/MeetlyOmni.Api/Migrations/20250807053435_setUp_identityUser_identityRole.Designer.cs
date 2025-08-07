@@ -15,7 +15,7 @@ namespace MeetlyOmni.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20250807053435_setUp_identityUser_identityRole")]
-    partial class setUp_identityUser_identityRole
+    partial class SetUp_identityUser_identityRole
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
