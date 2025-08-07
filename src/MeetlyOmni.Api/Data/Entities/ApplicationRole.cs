@@ -2,22 +2,24 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-using Microsoft.AspNetCore.Identity;
-
 namespace MeetlyOmni.Api.Data.Entities
 {
+    using Microsoft.AspNetCore.Identity;
+
     public class ApplicationRole : IdentityRole<Guid>
     {
-        public ApplicationRole() : base()
+        public ApplicationRole()
+            : base()
         {
-            CreatedAt = DateTimeOffset.UtcNow;
-            UpdatedAt = DateTimeOffset.UtcNow;
+            this.CreatedAt = DateTimeOffset.UtcNow;
+            this.UpdatedAt = DateTimeOffset.UtcNow;
         }
 
-        public ApplicationRole(string roleName) : base(roleName)
+        public ApplicationRole(string roleName)
+            : base(roleName)
         {
-            CreatedAt = DateTimeOffset.UtcNow;
-            UpdatedAt = DateTimeOffset.UtcNow;
+            this.CreatedAt = DateTimeOffset.UtcNow;
+            this.UpdatedAt = DateTimeOffset.UtcNow;
         }
 
         public string? Description { get; set; }

@@ -2,11 +2,10 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-using Microsoft.AspNetCore.Identity;
-
 namespace MeetlyOmni.Api.Data.Entities
 {
     using MeetlyOmni.Api.Common.Enums.Members;
+    using Microsoft.AspNetCore.Identity;
 
     public class Member : IdentityUser<Guid>
     {

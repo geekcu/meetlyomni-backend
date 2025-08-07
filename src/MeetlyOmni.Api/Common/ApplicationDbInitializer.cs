@@ -21,7 +21,7 @@ namespace MeetlyOmni.Api.Common
             var roles = new[]
             {
                 new { Name = RoleConstants.Admin, Description = "公司管理员 - 拥有完整权限" },
-                new { Name = RoleConstants.Employee, Description = "公司员工 - 拥有有限权限" }
+                new { Name = RoleConstants.Employee, Description = "公司员工 - 拥有有限权限" },
             };
 
             foreach (var roleInfo in roles)
@@ -34,7 +34,7 @@ namespace MeetlyOmni.Api.Common
                     {
                         Name = roleInfo.Name,
                         NormalizedName = roleInfo.Name.ToUpperInvariant(),
-                        Description = roleInfo.Description
+                        Description = roleInfo.Description,
                     });
 
                     if (result.Succeeded)
@@ -43,7 +43,8 @@ namespace MeetlyOmni.Api.Common
                     }
                     else
                     {
-                        logger.LogError("Failed to create role {RoleName}: {Errors}",
+                        logger.LogError(
+                            "Failed to create role {RoleName}: {Errors}",
                             roleInfo.Name, string.Join(", ", result.Errors.Select(e => e.Description)));
                     }
                 }
@@ -73,7 +74,7 @@ namespace MeetlyOmni.Api.Common
                     EmailConfirmed = true,
                     OrgId = Guid.Empty,
                     LocalMemberNumber = 1,
-                    LanguagePref = "en"
+                    LanguagePref = "en",
                 };
 
                 var defaultPassword = "Admin@123!";
@@ -87,7 +88,8 @@ namespace MeetlyOmni.Api.Common
                 }
                 else
                 {
-                    logger.LogError("Failed to create default admin user: {Errors}",
+                    logger.LogError(
+                        "Failed to create default admin user: {Errors}",
                         string.Join(", ", result.Errors.Select(e => e.Description)));
                 }
             }
@@ -99,5 +101,7 @@ namespace MeetlyOmni.Api.Common
     }
 
     // 非 static 类型用于注入 ILogger
-    public class ApplicationDbInitializerLog { }
+    public class ApplicationDbInitializerLog
+    {
+    }
 }
