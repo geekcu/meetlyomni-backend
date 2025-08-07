@@ -7,6 +7,7 @@
 namespace MeetlyOmni.Api.Migrations
 {
     using System;
+
     using Microsoft.EntityFrameworkCore.Migrations;
 
     /// <inheritdoc />
