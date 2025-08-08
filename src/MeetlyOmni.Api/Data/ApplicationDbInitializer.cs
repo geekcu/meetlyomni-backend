@@ -18,8 +18,8 @@ public static class ApplicationDbInitializer
 
         var roles = new[]
         {
-            new { Name = RoleConstants.Admin, Description = "公司管理员 - 拥有完整权限" },
-            new { Name = RoleConstants.Employee, Description = "公司员工 - 拥有有限权限" },
+            new { Name = RoleConstants.Admin, Description = "Company admin - has full access to all features" },
+            new { Name = RoleConstants.Employee, Description = "Company employee - can create events and games" },
         };
 
         foreach (var roleInfo in roles)
