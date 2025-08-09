@@ -45,7 +45,8 @@ namespace MeetlyOmni.Api.Data
                     {
                         logger.LogError(
                             "Failed to create role {RoleName}: {Errors}",
-                            roleInfo.Name, string.Join(", ", result.Errors.Select(e => e.Description)));
+                            roleInfo.Name, 
+                            string.Join(", ", result.Errors.Select(e => e.Description)));
                     }
                 }
                 else

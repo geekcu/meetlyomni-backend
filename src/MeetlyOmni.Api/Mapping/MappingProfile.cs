@@ -6,12 +6,16 @@ namespace MeetlyOmni.Api.Mapping
 {
     using AutoMapper;
 
+    using MeetlyOmni.Api.Data.Entities;
+    using MeetlyOmni.Api.Models.Members;
+
     public class MappingProfile : Profile
     {
         public MappingProfile()
         {
             // TODO: map your DTOs, for example:
             // CreateMap<CreateUserDto, User>();
+            CreateMap<Member, MemberDto>();
         }
     }
 }

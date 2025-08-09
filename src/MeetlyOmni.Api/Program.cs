@@ -1,35 +1,50 @@
 // <copyright file="Program.cs" company="MeetlyOmni">
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
-
+using Npgsql;
+using System.Text;
 using MeetlyOmni.Api.Data;
 using MeetlyOmni.Api.Data.Entities;
 using MeetlyOmni.Api.Mapping;
+using MeetlyOmni.Api.Service.JwtService;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
+using MeetlyOmni.Api.Service.MemberService;
+using MeetlyOmni.Api.Service.OrganizationService;
+using MeetlyOmni.Api.Service.RegistrationService;
+using MeetlyOmni.Api.Data.Repository.MemberRepository;
+using MeetlyOmni.Api.Data.Repository.OrganizationRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Logging config (optional, but recommended)
+// ---- Logging ----
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
+// ---- DB Connection ----
 var connectionString = builder.Configuration.GetConnectionString("MeetlyOmniDb");
-
-if (string.IsNullOrEmpty(connectionString))
-{
+if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException("Database connection string 'MeetlyOmniDb' is not configured.");
-}
 
-// PostgreSQL DbContext
+// setup DataSource and start using Dynamic JSON（System.Text.Json）
+var dsBuilder = new NpgsqlDataSourceBuilder(connectionString);
+dsBuilder.EnableDynamicJson();           // key point, start Dynamic  JSON
+
+// 如果偏好 Newtonsoft.Json，请用：dsBuilder.UseJsonNet();
+
+var dataSource = dsBuilder.Build();
+
+// ---- DbContext ----
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(dataSource));
 
-// Identity Services
+// ---- Identity ----
 builder.Services.AddIdentity<Member, ApplicationRole>(options =>
 {
-    // Password settings
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireNonAlphanumeric = true;
@@ -37,42 +52,87 @@ builder.Services.AddIdentity<Member, ApplicationRole>(options =>
     options.Password.RequiredLength = 6;
     options.Password.RequiredUniqueChars = 1;
 
-    // Lockout settings
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
     options.Lockout.MaxFailedAccessAttempts = 5;
     options.Lockout.AllowedForNewUsers = true;
 
-    // User settings
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// Health Check
-builder.Services.AddHealthChecks()
-    .AddNpgSql(connectionString);
+// ---- Health Checks ----
+builder.Services.AddHealthChecks().AddNpgSql(connectionString);
 
+// ---- Controllers & Swagger ----
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Register AutoMapper and scan for profiles starting from MappingProfile's assembly
+// ---- AutoMapper ----
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+
+// ---- Application Services ----
+builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+builder.Services.AddScoped<IMemberService, MemberService>();
+builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+
+// ---- JWT Options (强类型) ----
+builder.Services.AddOptions<JwtOptions>()
+    .Bind(builder.Configuration.GetSection("Jwt"))
+    .Validate(o => !string.IsNullOrWhiteSpace(o.Issuer), "Jwt:Issuer is required")
+    .Validate(o => !string.IsNullOrWhiteSpace(o.Audience), "Jwt:Audience is required")
+    .Validate(o => !string.IsNullOrWhiteSpace(o.KeyB64), "Jwt:KeyB64 is required")
+    .Validate(o => o.AccessTokenMinutes >= 5 && o.AccessTokenMinutes <= 120, "AccessTokenMinutes should be 5..120")
+    .ValidateOnStart();
+
+// ---- AuthN/AuthZ ----
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer(options =>
+    {
+        var jwt = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwt.Issuer,
+
+            ValidateAudience = true,
+            ValidAudience = jwt.Audience,
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(jwt.KeyB64)),
+
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromMinutes(2),
+
+            // 和你发的 "role" claim 对齐
+            RoleClaimType = "role",
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    // 可选：示例策略（需要 Admin 角色）
+    options.AddPolicy("RequireAdmin", p => p.RequireRole("Admin"));
+});
+
+// ---- App Services ----
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 
-// Database initialization
+// ---- DB Init / Seed ----
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
     try
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogInformation("Starting database initialization...");
-
-        // 确保角色存在
         await ApplicationDbInitializer.SeedRolesAsync(services);
         logger.LogInformation("Database initialization completed successfully.");
     }
@@ -83,7 +143,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Swagger
+// ---- Middleware ----
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -92,7 +152,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
