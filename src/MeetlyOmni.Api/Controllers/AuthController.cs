@@ -8,6 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MeetlyOmni.Api.Controllers
 {
+    // 说明：此控制器包含与 Google OAuth2.0 + PKCE 相关的最小实现（MVF）。
+    // 前端会将授权码（code）与 PKCE 的 code_verifier 发送到 /api/auth/google/exchange，
+    // 后端携带这些信息向 Google token 端点交换 id_token/refresh_token；
+    // 然后验证 id_token 的签名与受众（audience），并在本地创建/更新用户（以邮箱为键的 MVF 实现）。
+    // 注意：生产最佳实践应存储 Google 的 sub 作为外部身份主键，并检查 email_verified。
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
@@ -23,18 +28,22 @@ namespace MeetlyOmni.Api.Controllers
             this.configuration = configuration;
         }
 
+        // 输入模型：前端携带授权码与 PKCE 的 code_verifier
         public record GoogleExchangeRequest(string code, string codeVerifier);
 
+        // 输出模型：当前 MVF 返回 Google 的 id_token。长期建议改为返回“自家应用的短时 JWT”。
         public record ExchangeResponse(bool success, string idToken, string message);
 
         [HttpPost("google/exchange")]
         public async Task<IActionResult> ExchangeGoogleCode([FromBody] GoogleExchangeRequest request, CancellationToken cancellationToken)
         {
+            // 基本校验
             if (string.IsNullOrWhiteSpace(request.code) || string.IsNullOrWhiteSpace(request.codeVerifier))
             {
                 return BadRequest(new { success = false, message = "Invalid code or code_verifier" });
             }
 
+            // 从配置读取 Google OAuth 参数
             var clientId = configuration["Google:ClientId"];
             var clientSecret = configuration["Google:ClientSecret"]; // optional for PKCE in confidential clients
             var redirectUri = configuration["Google:RedirectUri"]; // http://localhost:3000/auth/google/callback
@@ -42,6 +51,7 @@ namespace MeetlyOmni.Api.Controllers
             var httpClient = httpClientFactory.CreateClient();
             var tokenEndpoint = "https://oauth2.googleapis.com/token";
 
+            // 使用授权码 + code_verifier 交换令牌（PKCE）
             var form = new Dictionary<string, string>
             {
                 ["client_id"] = clientId!,
@@ -79,7 +89,7 @@ namespace MeetlyOmni.Api.Controllers
                 return BadRequest(new { success = false, message = "id_token missing in token response" });
             }
 
-            // Verify id_token
+            // 验证 id_token 的签名与受众（audience 必须等于本应用的 client_id）
             GoogleJsonWebSignature.Payload payload;
             try
             {
@@ -93,6 +103,8 @@ namespace MeetlyOmni.Api.Controllers
                 return Unauthorized(new { success = false, message = $"Invalid id_token: {ex.Message}" });
             }
 
+            // MVF：以邮箱为键在默认组织下查找/创建成员
+            // 建议后续：存储 payload.Subject (sub) 作为外部身份主键，并检查 payload.EmailVerified。
             var email = payload.Email;
             if (string.IsNullOrWhiteSpace(email))
             {
@@ -140,7 +152,7 @@ namespace MeetlyOmni.Api.Controllers
             }
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            // Set refresh token in HttpOnly cookie (if present)
+            // 如果 Google 返回了 refresh_token，则写入 HttpOnly Cookie，便于后续刷新 id_token
             if (!string.IsNullOrEmpty(refreshToken))
             {
                 Response.Cookies.Append(
@@ -161,6 +173,7 @@ namespace MeetlyOmni.Api.Controllers
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshIdToken(CancellationToken cancellationToken)
         {
+            // 从 HttpOnly Cookie 读取 refresh_token，去 Google 刷新 id_token
             if (!Request.Cookies.TryGetValue("refresh_token", out var refreshToken) || string.IsNullOrEmpty(refreshToken))
             {
                 return Unauthorized(new { success = false, message = "refresh_token cookie missing" });
@@ -212,7 +225,7 @@ namespace MeetlyOmni.Api.Controllers
         [HttpGet("profile")]
         public async Task<IActionResult> GetProfile(CancellationToken cancellationToken)
         {
-            // Read id_token from Authorization header: Bearer <token>
+            // 从 Authorization: Bearer <token> 头读取前端携带的 id_token（MVF：直接使用 Google id_token）
             var authHeader = Request.Headers["Authorization"].ToString();
             if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
