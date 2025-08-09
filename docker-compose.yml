@@ -17,6 +17,8 @@ services:
       context: ./src/MeetlyOmni.Api
     depends_on:
       - db
+    env_file:
+      - ./.env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - DB_NAME=${DB_NAME}

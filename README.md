@@ -81,7 +81,7 @@ If any step fails, the commit will be blocked until issues are resolved.
 
 Once running, visit:
 
-- **Swagger UI**: https://localhost:5001/swagger
+- **Swagger UI**: https://localhost:5000/swagger
 - **Health Check**: https://localhost:5001/health
 
 ## Contributing
