@@ -1,14 +1,16 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-
-using MeetlyOmni.Api.Data.Entities;
-
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
+﻿// <copyright file="TokenService.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Service.JwtService
 {
+    using System.IdentityModel.Tokens.Jwt;
+    using System.Security.Claims;
+    using MeetlyOmni.Api.Data.Entities;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.Extensions.Options;
+    using Microsoft.IdentityModel.Tokens;
+
     public class TokenService : ITokenService
     {
         private readonly UserManager<Member> _userManager;

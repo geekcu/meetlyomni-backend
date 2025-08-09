@@ -1,12 +1,15 @@
-﻿using System.Security.Cryptography;
-
-using MeetlyOmni.Api.Common.Enums.Organization;
-using MeetlyOmni.Api.Data;
-using MeetlyOmni.Api.Data.Entities;
-using MeetlyOmni.Api.Data.Repository.OrganizationRepository;
+﻿// <copyright file="OrganizationService.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Service.OrganizationService
 {
+    using System.Security.Cryptography;
+    using MeetlyOmni.Api.Common.Enums.Organization;
+    using MeetlyOmni.Api.Data;
+    using MeetlyOmni.Api.Data.Entities;
+    using MeetlyOmni.Api.Data.Repository.OrganizationRepository;
+
     public class OrganizationService : IOrganizationService
     {
         public readonly ApplicationDbContext _context;

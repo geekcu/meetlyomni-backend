@@ -1,22 +1,21 @@
 // <copyright file="Program.cs" company="MeetlyOmni">
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
-using Npgsql;
 using System.Text;
 using MeetlyOmni.Api.Data;
 using MeetlyOmni.Api.Data.Entities;
+using MeetlyOmni.Api.Data.Repository.MemberRepository;
+using MeetlyOmni.Api.Data.Repository.OrganizationRepository;
 using MeetlyOmni.Api.Mapping;
 using MeetlyOmni.Api.Service.JwtService;
-
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.Options;
 using MeetlyOmni.Api.Service.MemberService;
 using MeetlyOmni.Api.Service.OrganizationService;
 using MeetlyOmni.Api.Service.RegistrationService;
-using MeetlyOmni.Api.Data.Repository.MemberRepository;
-using MeetlyOmni.Api.Data.Repository.OrganizationRepository;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,14 +27,15 @@ builder.Logging.AddDebug();
 // ---- DB Connection ----
 var connectionString = builder.Configuration.GetConnectionString("MeetlyOmniDb");
 if (string.IsNullOrWhiteSpace(connectionString))
+{
     throw new InvalidOperationException("Database connection string 'MeetlyOmniDb' is not configured.");
+}
 
 // setup DataSource and start using Dynamic JSON（System.Text.Json）
 var dsBuilder = new NpgsqlDataSourceBuilder(connectionString);
 dsBuilder.EnableDynamicJson();           // key point, start Dynamic  JSON
 
 // 如果偏好 Newtonsoft.Json，请用：dsBuilder.UseJsonNet();
-
 var dataSource = dsBuilder.Build();
 
 // ---- DbContext ----
@@ -94,7 +94,7 @@ builder.Services.AddOptions<JwtOptions>()
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer(options =>
     {
-        var jwt = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
+        var jwt = builder.Configuration.GetSection("Jwt").Get<JwtOptions>() !;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,

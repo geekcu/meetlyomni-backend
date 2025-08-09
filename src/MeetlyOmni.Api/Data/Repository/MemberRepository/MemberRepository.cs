@@ -1,8 +1,11 @@
-﻿
-using MeetlyOmni.Api.Data.Entities;
+﻿// <copyright file="MemberRepository.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Repository.MemberRepository
 {
+    using MeetlyOmni.Api.Data.Entities;
+
     public class MemberRepository : IMemberRepository
     {
         private readonly ApplicationDbContext _context;

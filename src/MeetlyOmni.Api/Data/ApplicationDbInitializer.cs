@@ -23,7 +23,6 @@ namespace MeetlyOmni.Api.Data
                 new { Name = RoleConstants.Employee, Description = "Company employee - can create events and games" },
             };
 
-
             foreach (var roleInfo in roles)
             {
                 if (!await roleManager.RoleExistsAsync(roleInfo.Name))
@@ -45,7 +44,7 @@ namespace MeetlyOmni.Api.Data
                     {
                         logger.LogError(
                             "Failed to create role {RoleName}: {Errors}",
-                            roleInfo.Name, 
+                            roleInfo.Name,
                             string.Join(", ", result.Errors.Select(e => e.Description)));
                     }
                 }

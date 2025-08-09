@@ -1,10 +1,14 @@
-﻿using MeetlyOmni.Api.Data;
-using MeetlyOmni.Api.Models.Members;
-using MeetlyOmni.Api.Service.MemberService;
-using MeetlyOmni.Api.Service.OrganizationService;
+﻿// <copyright file="RegistrationService.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Service.RegistrationService
 {
+    using MeetlyOmni.Api.Data;
+    using MeetlyOmni.Api.Models.Members;
+    using MeetlyOmni.Api.Service.MemberService;
+    using MeetlyOmni.Api.Service.OrganizationService;
+
     public class RegistrationService : IRegistrationService
     {
         private readonly ApplicationDbContext _context;
@@ -17,6 +21,7 @@ namespace MeetlyOmni.Api.Service.RegistrationService
             _orgService = orgService;
             _memberService = memberService;
         }
+
         public async Task<MemberDto> SignUpAdminAsync(SignUpBindingModel input)
         {
 
@@ -33,7 +38,7 @@ namespace MeetlyOmni.Api.Service.RegistrationService
                 Email = member.Email!,
                 FullName = input.FullName,
                 PhoneNumber = member.PhoneNumber,
-                Role = "Admin"
+                Role = "Admin",
             };
         }
     }

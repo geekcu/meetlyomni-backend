@@ -1,10 +1,13 @@
-﻿using MeetlyOmni.Api.Models.Members;
-using MeetlyOmni.Api.Service.RegistrationService;
-
-using Microsoft.AspNetCore.Mvc;
+﻿// <copyright file="AuthController.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Controllers
 {
+    using MeetlyOmni.Api.Models.Members;
+    using MeetlyOmni.Api.Service.RegistrationService;
+    using Microsoft.AspNetCore.Mvc;
+
     [ApiController]
     [Route("api/auth")]
     public class AuthController : ControllerBase

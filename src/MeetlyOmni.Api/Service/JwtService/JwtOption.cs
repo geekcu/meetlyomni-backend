@@ -1,4 +1,8 @@
-﻿namespace MeetlyOmni.Api.Service.JwtService
+﻿// <copyright file="JwtOption.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
+// </copyright>
+
+namespace MeetlyOmni.Api.Service.JwtService
 {
     public class JwtOptions
     {
@@ -10,5 +14,4 @@
 
         public int AccessTokenMinutes { get; set; }
     }
-
 }

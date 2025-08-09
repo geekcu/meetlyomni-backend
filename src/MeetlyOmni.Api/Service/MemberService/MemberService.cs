@@ -1,24 +1,23 @@
-﻿
-using System.Security.Claims;
-
-using MeetlyOmni.Api.Data;
-using MeetlyOmni.Api.Data.Entities;
-using MeetlyOmni.Api.Models.Members;
-
-using Microsoft.AspNetCore.Identity;
+﻿// <copyright file="MemberService.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Service.MemberService
 {
+    using System.Security.Claims;
+    using MeetlyOmni.Api.Data;
+    using MeetlyOmni.Api.Data.Entities;
+    using MeetlyOmni.Api.Models.Members;
+    using Microsoft.AspNetCore.Identity;
+
     public class MemberService : IMemberService
     {
         private const string AdminRoleName = "Admin";
         private readonly UserManager<Member> _userManager;
 
-
         public MemberService(UserManager<Member> userManager)
         {
             _userManager = userManager;
-
         }
 
         public async Task<Member> CreateAdminAsync(Guid orgId, string email, string password, string phone, string fullName)
@@ -31,7 +30,7 @@ namespace MeetlyOmni.Api.Service.MemberService
                 UserName = email.Trim(),
                 PhoneNumber = phone,
                 CreatedAt = DateTimeOffset.UtcNow,
-                UpdatedAt = DateTimeOffset.UtcNow
+                UpdatedAt = DateTimeOffset.UtcNow,
             };
 
             var createResult = await _userManager.CreateAsync(member, password);

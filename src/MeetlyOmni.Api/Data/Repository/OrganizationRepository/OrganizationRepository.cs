@@ -1,9 +1,12 @@
-﻿using MeetlyOmni.Api.Data.Entities;
-
-using Microsoft.EntityFrameworkCore;
+﻿// <copyright file="OrganizationRepository.cs" company="MeetlyOmni">
+// Copyright (c) MeetlyOmni. All rights reserved.
+// </copyright>
 
 namespace MeetlyOmni.Api.Data.Repository.OrganizationRepository
 {
+    using MeetlyOmni.Api.Data.Entities;
+    using Microsoft.EntityFrameworkCore;
+
     public class OrganizationRepository : IOrganizationRepository
     {
         private readonly ApplicationDbContext _context;
