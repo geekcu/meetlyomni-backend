@@ -25,33 +25,45 @@ namespace MeetlyOmni.Api.Service.JwtService
             _creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         }
 
-        public async Task<string> GenerateTokenAsync(Member member)
+        public async Task<TokenResult> GenerateTokenAsync(Member member)
         {
-            var now = DateTime.UtcNow;
+            var now = DateTimeOffset.UtcNow;
+            var expires = now.AddMinutes(_opt.AccessTokenMinutes);
+
             var claims = new List<Claim>
         {
             new (JwtRegisteredClaimNames.Sub, member.Id.ToString()),
             new (JwtRegisteredClaimNames.Email, member.Email ?? string.Empty),
-            new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new (JwtRegisteredClaimNames.Iat,
-            new DateTimeOffset(now).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
+            new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
+            new (JwtRegisteredClaimNames.Iat, now.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
+            new ("org_id", member.OrgId.ToString()),
         };
 
+            // 追加 full_name（如果你注册时存了这个 claim）
+            var userClaims = await _userManager.GetClaimsAsync(member);
+            var fullName = userClaims.FirstOrDefault(c => c.Type == "full_name")?.Value;
+            if (!string.IsNullOrWhiteSpace(fullName))
+            {
+                claims.Add(new Claim("full_name", fullName));
+            }
+
+            // 角色写入 "role"（与你的 JwtBearerOptions.RoleClaimType = "role" 对齐）
             var roles = await _userManager.GetRolesAsync(member);
             foreach (var role in roles)
             {
                 claims.Add(new Claim("role", role));
             }
 
-            var token = new JwtSecurityToken(
+            var jwt = new JwtSecurityToken(
                 issuer: _opt.Issuer,
                 audience: _opt.Audience,
                 claims: claims,
-                notBefore: now,
-                expires: now.AddMinutes(_opt.AccessTokenMinutes),
+                notBefore: now.UtcDateTime,
+                expires: expires.UtcDateTime,
                 signingCredentials: _creds);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(jwt);
+            return new TokenResult(tokenString, expires);
         }
     }
 }

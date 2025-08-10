@@ -8,6 +8,6 @@ namespace MeetlyOmni.Api.Service.JwtService
 
     public interface ITokenService
     {
-        Task<string> GenerateTokenAsync(Member member);
+        Task<TokenResult> GenerateTokenAsync(Member member);
     }
 }

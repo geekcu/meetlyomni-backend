@@ -7,6 +7,7 @@ using MeetlyOmni.Api.Data.Entities;
 using MeetlyOmni.Api.Data.Repository.MemberRepository;
 using MeetlyOmni.Api.Data.Repository.OrganizationRepository;
 using MeetlyOmni.Api.Mapping;
+using MeetlyOmni.Api.Service.AuthService;
 using MeetlyOmni.Api.Service.JwtService;
 using MeetlyOmni.Api.Service.MemberService;
 using MeetlyOmni.Api.Service.OrganizationService;
@@ -73,6 +74,7 @@ builder.Services.AddSwaggerGen();
 // ---- AutoMapper ----
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+// ---- Repositories ----
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 
@@ -80,6 +82,7 @@ builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // ---- JWT Options (强类型) ----
 builder.Services.AddOptions<JwtOptions>()

@@ -16,7 +16,7 @@ namespace MeetlyOmni.Api.Data.Configurations
         public void Configure(EntityTypeBuilder<Member> builder)
         {
             // using Members instead of AspNetUsers
-            builder.ToTable("Members");
+            //builder.ToTable("Members");
 
             builder.Property(m => m.Id)
                    .HasDefaultValueSql("gen_random_uuid()")
