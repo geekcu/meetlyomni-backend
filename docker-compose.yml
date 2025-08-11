@@ -6,29 +6,39 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
-      POSTGRES_SHARED_BUFFERS: 512MB
-      POSTGRES_MAX_CONNECTIONS: 20
+    # Configure PostgreSQL runtime parameters via command (official image pattern)
+    command: ["postgres", "-c", "shared_buffers=512MB", "-c", "max_connections=20"]
     ports:
       - "5432:5432"
     mem_limit: 2g
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   api:
     build:
       context: ./src/MeetlyOmni.Api
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASS=${DB_PASS}
+      # Use service name "db" inside the Docker network
       - ConnectionStrings__MeetlyOmniDb=Host=db;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASS}
+      # Provide JWT base64 key required by options validation
+      - Jwt__KeyB64=${JWT_KEY_B64}
     ports:
       - "5000:80"
     volumes:
       - ./src/MeetlyOmni.Api:/app
     working_dir: /app
-    command: sh -c "dotnet ef database update && dotnet watch run --urls=http://0.0.0.0:80"
+    # Wait and retry until DB is ready & migration succeeds
+    command: sh -c "until dotnet ef database update; do echo 'Waiting for DB...'; sleep 2; done; dotnet run --urls=http://0.0.0.0:80"
     mem_limit: 2g
 
   adminer:
