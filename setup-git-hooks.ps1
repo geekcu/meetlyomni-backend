@@ -79,15 +79,21 @@ function RunCoverage {
 # Ensure local tools are restored (no-op if already restored)
 dotnet tool restore | Out-Null
 
-$covDir = Join-Path (Get-Location) "coverage"
+$covDir  = Join-Path (Get-Location) "coverage"
 if (-not (Test-Path $covDir)) { New-Item -ItemType Directory -Path $covDir | Out-Null }
 $covFile = Join-Path $covDir "coverage.cobertura.xml"
 
 Write-Host "[pre-push] Tests + coverage (Cobertura)..." -ForegroundColor Cyan
+
+# Correct order: options FIRST, then --, then the command to run
 $covArgs = @(
-  "collect","-o",$covFile,"-f","cobertura",
+  "collect",
+  "-f","cobertura",
+  "-o",$covFile,
+  "--",
   "dotnet","test",$Solution,"-c","Release","--no-build"
 )
+
 $exit = RunCoverage -Args $covArgs
 if ($exit -ne 0) { Fail "dotnet-coverage or tests failed." }
 if (-not (Test-Path $covFile)) { Fail "Coverage file not found: $covFile" }
