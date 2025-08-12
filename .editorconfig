@@ -96,3 +96,4 @@ dotnet_diagnostic.SA1200.severity = none  # Using directives placement
 dotnet_diagnostic.SA1616.severity = none  # Return value must be documented
 dotnet_diagnostic.SA1618.severity = none  # Generic type parameters must be documented
 dotnet_diagnostic.SA1000.severity = none  # 'new' must be followed by a space (disable to allow 'new()')
+dotnet_diagnostic.SA1009.severity = none

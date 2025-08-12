@@ -50,7 +50,7 @@ public static class ModelBuilderExtensions
         where TEnum : struct, Enum
     {
         var converter = new ValueConverter<TEnum?, string>(
-            v => v.HasValue ? v.Value.ToString() ! : null!,
+            v => v.HasValue ? v.Value.ToString()! : null!,
             v => string.IsNullOrEmpty(v) ? (TEnum?)null : Enum.Parse<TEnum>(v));
 
         var property = builder
