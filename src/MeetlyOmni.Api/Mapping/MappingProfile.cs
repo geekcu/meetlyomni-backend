@@ -2,16 +2,14 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-namespace MeetlyOmni.Api.Mapping
-{
-    using AutoMapper;
+using AutoMapper;
 
-    public class MappingProfile : Profile
+namespace MeetlyOmni.Api.Mapping;
+public class MappingProfile : Profile
+{
+    public MappingProfile()
     {
-        public MappingProfile()
-        {
-            // TODO: map your DTOs, for example:
-            // CreateMap<CreateUserDto, User>();
-        }
+        // TODO: map your DTOs, for example:
+        // CreateMap<CreateUserDto, User>();
     }
 }

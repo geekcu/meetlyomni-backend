@@ -9,7 +9,9 @@ public static class LaunchSettingsReader
     public static string GetBaseUrl(string profileName = "https")
     {
         if (string.IsNullOrWhiteSpace(profileName))
+        {
             throw new ArgumentException("Profile name cannot be null or empty", nameof(profileName));
+        }
         // Adjust path to point to your API project relative to the test project
         var apiProjectPath = Environment.GetEnvironmentVariable("API_PROJECT_PATH") ??
             FindApiProjectPath() ??
@@ -18,7 +20,9 @@ public static class LaunchSettingsReader
         var pathToLaunchSettings = Path.Combine(apiProjectPath, "Properties", "launchSettings.json");
 
         if (!File.Exists(pathToLaunchSettings))
+        {
             throw new FileNotFoundException("launchSettings.json not found", pathToLaunchSettings);
+        }
 
         var json = File.ReadAllText(pathToLaunchSettings);
         JsonNode? root;
@@ -34,11 +38,15 @@ public static class LaunchSettingsReader
 
         var profiles = root?["profiles"]?.AsObject();
         if (profiles == null || !profiles.ContainsKey(profileName))
+        {
             throw new InvalidOperationException($"Profile '{profileName}' not found in launchSettings.json");
+        }
 
         var appUrls = profiles[profileName]?["applicationUrl"]?.ToString();
         if (string.IsNullOrEmpty(appUrls))
+        {
             throw new InvalidOperationException("applicationUrl is missing");
+        }
 
         // Return the first URL (https preferred)
         var urls = appUrls.Split(';', StringSplitOptions.RemoveEmptyEntries)
@@ -47,7 +55,9 @@ public static class LaunchSettingsReader
                             .ToArray();
 
         if (!urls.Any())
+        {
             throw new InvalidOperationException("No valid URLs found in applicationUrl");
+        }
 
         return urls.FirstOrDefault(u => u.StartsWith("https", StringComparison.OrdinalIgnoreCase)) ?? urls.First();
     }
@@ -59,7 +69,10 @@ public static class LaunchSettingsReader
         {
             var apiProjectDir = Path.Combine(currentDir.FullName, "MeetlyOmni.Api");
             if (Directory.Exists(apiProjectDir))
+            {
                 return apiProjectDir;
+            }
+
             currentDir = currentDir.Parent;
         }
         return null;

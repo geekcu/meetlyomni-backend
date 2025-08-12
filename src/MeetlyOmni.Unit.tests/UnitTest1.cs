@@ -1,12 +1,11 @@
-namespace MeetlyOmni.Unit.tests
+namespace MeetlyOmni.Unit.tests;
+
+public class UnitTest1
 {
-    public class UnitTest1
+    [Fact]
+    [Trait("Category", "Unit")]
+    public void Test1()
     {
-        [Fact]
-        [Trait("Category", "Unit")]
-        public void Test1()
-        {
-            // your test code
-        }
+        // your test code
     }
 }
