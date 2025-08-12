@@ -23,7 +23,7 @@ public class Member
 
     public string LanguagePref { get; set; } = "en";
 
-    public List<string> Tags { get; set; } = new ();
+    public List<string> Tags { get; set; } = new();
 
     public int Points { get; set; } = 0;
 
