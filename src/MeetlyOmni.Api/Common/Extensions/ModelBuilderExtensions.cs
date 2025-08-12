@@ -45,6 +45,7 @@ public static class ModelBuilderExtensions
         string? columnType = null,
         TEnum? defaultValue = null,
         bool isRequired = false)
+
         where TEntity : class
         where TEnum : struct, Enum
     {
