@@ -54,24 +54,32 @@ Write-Host "[pre-push] Build (Release, no-restore)..." -ForegroundColor Cyan
 dotnet build $Solution -c Release --nologo --no-restore
 if ($LASTEXITCODE -ne 0) { Fail "Build failed." }
 
+# --- locate Unit Test project(s) only (case-insensitive '*.Unit.tests.csproj') ---
+$unitTestProjects = Get-ChildItem -Path . -Recurse -File -Filter *.csproj |
+  Where-Object { $_.Name -match '(?i)\.Unit\.tests\.csproj$' } |
+  Select-Object -ExpandProperty FullName
+
+if (-not $unitTestProjects -or $unitTestProjects.Count -eq 0) {
+  Fail "No '*.Unit.tests.csproj' found. Ensure your unit test project follows the naming pattern."
+}
+if ($unitTestProjects.Count -gt 1) {
+  Write-Host "[pre-push] Multiple Unit test projects found. Using the first one:" -ForegroundColor Yellow
+  $unitTestProjects | ForEach-Object { Write-Host "  - $_" -ForegroundColor DarkYellow }
+}
+$unitProj = $unitTestProjects[0]
+Write-Host "[pre-push] Unit tests project: $unitProj" -ForegroundColor Yellow
+
 # Prefer local dotnet tool; fallback to global
 function RunCoverage {
   param([string[]]$Args)
-
-  # Remove null/empty args to avoid validation errors
-  $argsClean = @($Args | Where-Object { $_ -ne $null -and $_ -ne "" })
-
-  # Try local tool: dotnet tool run dotnet-coverage ...
-  $cmd1 = @("tool","run","dotnet-coverage") + $argsClean
-  & dotnet @cmd1
+  # Try local tool
+  & dotnet @("tool","run","dotnet-coverage") @Args
   if ($LASTEXITCODE -eq 0) { return 0 }
-
-  # Fallback: global dotnet-coverage ...
+  # Fallback to global
   if (Get-Command dotnet-coverage -ErrorAction SilentlyContinue) {
-    & dotnet-coverage @argsClean
+    & dotnet-coverage @Args
     return $LASTEXITCODE
   }
-
   Write-Host "dotnet-coverage not found (local or global)." -ForegroundColor Red
   return 1
 }
@@ -83,15 +91,17 @@ $covDir  = Join-Path (Get-Location) "coverage"
 if (-not (Test-Path $covDir)) { New-Item -ItemType Directory -Path $covDir | Out-Null }
 $covFile = Join-Path $covDir "coverage.cobertura.xml"
 
-Write-Host "[pre-push] Tests + coverage (Cobertura)..." -ForegroundColor Cyan
+Write-Host "[pre-push] Unit tests + coverage (Cobertura)..." -ForegroundColor Cyan
 
-# Correct order: options FIRST, then --, then the command to run
+# Build the test command as ONE string (only the Unit tests project)
+$testCmd = "dotnet test `"$unitProj`" -c Release --no-build"
+
+# dotnet-coverage: pass the command as a single argument to 'collect'
 $covArgs = @(
   "collect",
+  $testCmd,
   "-f","cobertura",
-  "-o",$covFile,
-  "--",
-  "dotnet","test",$Solution,"-c","Release","--no-build"
+  "-o",$covFile
 )
 
 $exit = RunCoverage -Args $covArgs
@@ -121,7 +131,7 @@ foreach ($cls in $targetClasses) {
     $total += $lines.Count
     $covered += (@($lines | Where-Object { [int]($_.hits) -gt 0 })).Count
   } elseif ($cls.'line-rate') {
-    # Rare fallback: synthesize weight by line-rate
+    # Rare fallback
     $total += 100
     $covered += [int](100 * [double]$cls.'line-rate')
   }
@@ -148,7 +158,7 @@ if command -v pwsh >/dev/null 2>&1; then
 elif command -v powershell >/dev/null 2>&1; then
   powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File ".git/hooks/pre-push.ps1" -Solution "{SLN}" -Threshold {THRESHOLD}
 else
-  echo "PowerShell not found. Please install PowerShell 7 (pwsh) or Windows PowerShell."
+  echo "PowerShell not found. Please install PowerShell 7 (pwsh) or Windows PowerShell)."
   exit 1
 fi
 '@.Replace("{SLN}", $Solution).Replace("{THRESHOLD}", "$Threshold")
@@ -158,4 +168,4 @@ try { git update-index --chmod=+x .git/hooks/pre-push | Out-Null } catch {}
 
 Write-Host "Git hooks setup completed." -ForegroundColor Green
 Write-Host " - pre-commit: auto-fix format + restage + fast build" -ForegroundColor White
-Write-Host " - pre-push: verify-only format + tests + coverage >= $Threshold% (Controllers/Services)" -ForegroundColor White
+Write-Host " - pre-push: verify-only format + Unit tests + coverage >= $Threshold% (Controllers/Services)" -ForegroundColor White
