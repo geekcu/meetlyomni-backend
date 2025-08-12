@@ -91,11 +91,20 @@ if (-not $hasControllers -and -not $hasServices) {
   Write-Host "[pre-push] Running unit tests..." -ForegroundColor Cyan
   dotnet test $unitProj -c Release --no-build
   if ($LASTEXITCODE -ne 0) { Fail "Unit tests failed." }
+  
+  # 显示测试结果摘要
+  Write-Host "`n[pre-push] ===== TEST SUMMARY =====" -ForegroundColor Cyan
+  Write-Host "[pre-push] ✅ Basic tests passed" -ForegroundColor Green
+  Write-Host "[pre-push] 📊 Coverage check: SKIPPED (no Controllers/Services code)" -ForegroundColor Yellow
+  Write-Host "[pre-push] 💡 Add Controllers/Services to enable coverage checking" -ForegroundColor White
+  Write-Host "[pre-push] =========================" -ForegroundColor Cyan
+  
   Write-Host "[pre-push] OK. Basic checks passed (coverage check skipped - no business logic code)." -ForegroundColor Green
   exit 0
 }
 
 Write-Host "[pre-push] Controllers/Services code detected. Running full coverage check..." -ForegroundColor Cyan
+Write-Host ("[pre-push] Coverage threshold: {0}%" -f $Threshold) -ForegroundColor DarkYellow
 
 # Ensure local tools are restored (no-op if already restored)
 dotnet tool restore | Out-Null
@@ -197,7 +206,23 @@ if ($total -le 0) {
 }
 
 $rate = [math]::Round(100.0 * $covered / $total, 2)
-Write-Host ("[pre-push] Controllers/Services coverage: {0}% (covered {1} / total {2})" -f $rate, $covered, $total) -ForegroundColor Yellow
+
+# 显示详细的覆盖率信息
+Write-Host "`n[pre-push] ===== COVERAGE REPORT =====" -ForegroundColor Cyan
+Write-Host ("[pre-push] Current Coverage: {0}%" -f $rate) -ForegroundColor Yellow
+Write-Host ("[pre-push] Required Coverage: {0}%" -f $Threshold) -ForegroundColor Yellow
+Write-Host ("[pre-push] Lines Covered: {0} / {1}" -f $covered, $total) -ForegroundColor White
+Write-Host ("[pre-push] Lines Remaining: {0}" -f ($total - $covered)) -ForegroundColor White
+
+# 显示覆盖率状态
+if ($rate -ge $Threshold) {
+  Write-Host ("[pre-push] ✅ Coverage PASSED ({0}% >= {1}%)" -f $rate, $Threshold) -ForegroundColor Green
+} else {
+  Write-Host ("[pre-push] ❌ Coverage FAILED ({0}% < {1}%)" -f $rate, $Threshold) -ForegroundColor Red
+  Write-Host ("[pre-push] Need to cover {0} more lines to reach {1}%" -f (($Threshold * $total / 100) - $covered), $Threshold) -ForegroundColor Red
+}
+
+Write-Host "[pre-push] ============================" -ForegroundColor Cyan
 
 if ($rate -lt $Threshold) {
   Fail ("Coverage below threshold {0}% < {1}% on Controllers/Services." -f $rate, $Threshold)
