@@ -145,11 +145,18 @@ try {
 }
 
 if ($exit -ne 0) { 
-  Write-Host "[pre-push] Coverage tool failed, running basic tests only..." -ForegroundColor Yellow
+  Write-Host "[pre-push] Coverage tool failed, but checking for existing coverage report..." -ForegroundColor Yellow
   dotnet test $unitProj -c Release --no-build
   if ($LASTEXITCODE -ne 0) { Fail "Unit tests failed." }
-  Write-Host "[pre-push] OK. Basic checks passed (coverage check skipped due to tool issues)." -ForegroundColor Green
-  exit 0
+  
+  # 即使覆盖率工具失败，也尝试读取现有的覆盖率报告
+  if (Test-Path $covFile) {
+    Write-Host "[pre-push] Found existing coverage report, analyzing..." -ForegroundColor Yellow
+  } else {
+    Write-Host "[pre-push] No coverage report found, skipping coverage check..." -ForegroundColor Yellow
+    Write-Host "[pre-push] OK. Basic checks passed (coverage check skipped due to tool issues)." -ForegroundColor Green
+    exit 0
+  }
 }
 
 if (-not (Test-Path $covFile)) { 

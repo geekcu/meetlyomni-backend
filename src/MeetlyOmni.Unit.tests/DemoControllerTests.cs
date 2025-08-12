@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MeetlyOmni.Unit.tests;
 
-public class TestControllerTests
+public class DemoControllerTests
 {
-    private readonly TestController _controller;
+    private readonly DemoController _controller;
 
-    public TestControllerTests()
+    public DemoControllerTests()
     {
-        _controller = new TestController();
+        _controller = new DemoController();
     }
 
     [Fact]
@@ -27,22 +27,10 @@ public class TestControllerTests
     }
 
     [Fact]
-    public void Get_ShouldReturnMessage()
+    public void Covered_ShouldReturnOkResult()
     {
         // Act
-        var result = _controller.Get();
-
-        // Assert
-        var okResult = result as OkObjectResult;
-        Assert.NotNull(okResult);
-        Assert.NotNull(okResult.Value);
-    }
-
-    [Fact]
-    public void Ping_ShouldReturnOkResult()
-    {
-        // Act
-        var result = _controller.Ping();
+        var result = _controller.Covered();
 
         // Assert
         Assert.IsType<OkObjectResult>(result);
@@ -52,15 +40,15 @@ public class TestControllerTests
     }
 
     [Fact]
-    public void Ping_ShouldReturnPong()
+    public void Covered_ShouldReturnCorrectMessage()
     {
         // Act
-        var result = _controller.Ping();
+        var result = _controller.Covered();
 
         // Assert
         var okResult = result as OkObjectResult;
         Assert.NotNull(okResult);
-        Assert.Equal("pong", okResult.Value);
+        Assert.Equal("This method is covered by tests", okResult.Value);
     }
 
     // 注意：我们没有测试 Uncovered 方法，这样覆盖率会低于80%
