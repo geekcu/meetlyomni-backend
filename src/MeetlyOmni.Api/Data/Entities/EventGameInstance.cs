@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+
 using MeetlyOmni.Api.Common.Enums.EventGameInstance;
 
 namespace MeetlyOmni.Api.Data.Entities;

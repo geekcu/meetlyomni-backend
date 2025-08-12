@@ -5,6 +5,7 @@
 using MeetlyOmni.Api.Common.Enums.MemberActivityLog;
 using MeetlyOmni.Api.Common.Extensions;
 using MeetlyOmni.Api.Data.Entities;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

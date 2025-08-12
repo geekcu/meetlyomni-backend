@@ -92,3 +92,4 @@ dotnet_naming_style.end_with_async.required_suffix = Async
 dotnet_diagnostic.SA1600.severity = none
 dotnet_diagnostic.SA1611.severity = none
 dotnet_diagnostic.SA1602.severity = none
+dotnet_diagnostic.SA1200.severity = none

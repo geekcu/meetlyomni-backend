@@ -3,6 +3,7 @@
 // </copyright>
 
 using MeetlyOmni.Api.Data.Entities;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace MeetlyOmni.Api.Data;

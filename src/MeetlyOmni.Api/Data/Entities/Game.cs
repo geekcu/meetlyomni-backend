@@ -3,6 +3,7 @@
 // </copyright>
 
 using System.Text.Json.Nodes;
+
 using MeetlyOmni.Api.Common.Enums.Game;
 
 namespace MeetlyOmni.Api.Data.Entities;
