@@ -94,9 +94,9 @@ if (-not $hasControllers -and -not $hasServices) {
   
   # 显示测试结果摘要
   Write-Host "`n[pre-push] ===== TEST SUMMARY =====" -ForegroundColor Cyan
-  Write-Host "[pre-push] ✅ Basic tests passed" -ForegroundColor Green
-  Write-Host "[pre-push] 📊 Coverage check: SKIPPED (no Controllers/Services code)" -ForegroundColor Yellow
-  Write-Host "[pre-push] 💡 Add Controllers/Services to enable coverage checking" -ForegroundColor White
+  Write-Host "[pre-push] PASS: Basic tests passed" -ForegroundColor Green
+  Write-Host "[pre-push] INFO: Coverage check: SKIPPED (no Controllers/Services code)" -ForegroundColor Yellow
+  Write-Host "[pre-push] TIP: Add Controllers/Services to enable coverage checking" -ForegroundColor White
   Write-Host "[pre-push] =========================" -ForegroundColor Cyan
   
   Write-Host "[pre-push] OK. Basic checks passed (coverage check skipped - no business logic code)." -ForegroundColor Green
@@ -223,9 +223,9 @@ Write-Host ("[pre-push] Lines Remaining: {0}" -f ($total - $covered)) -Foregroun
 
 # 显示覆盖率状态
 if ($rate -ge $Threshold) {
-  Write-Host ("[pre-push] ✅ Coverage PASSED ({0}% >= {1}%)" -f $rate, $Threshold) -ForegroundColor Green
+  Write-Host ("[pre-push] PASS: Coverage PASSED ({0}% >= {1}%)" -f $rate, $Threshold) -ForegroundColor Green
 } else {
-  Write-Host ("[pre-push] ❌ Coverage FAILED ({0}% < {1}%)" -f $rate, $Threshold) -ForegroundColor Red
+  Write-Host ("[pre-push] FAIL: Coverage FAILED ({0}% < {1}%)" -f $rate, $Threshold) -ForegroundColor Red
   Write-Host ("[pre-push] Need to cover {0} more lines to reach {1}%" -f (($Threshold * $total / 100) - $covered), $Threshold) -ForegroundColor Red
 }
 
