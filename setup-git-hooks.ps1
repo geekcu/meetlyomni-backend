@@ -7,17 +7,17 @@ param(
 Write-Host "Setting up Git hooks..." -ForegroundColor Cyan
 
 if (-not (Test-Path .git)) {
-  Write-Host "Error: Not in a Git repository" -ForegroundColor Red
+  Write-Host "Error: Not in a Git repository." -ForegroundColor Red
   exit 1
 }
 
-# Ensure hooks dir
+# Ensure hooks directory exists
 if (-not (Test-Path .git/hooks)) {
   New-Item -ItemType Directory -Path .git/hooks -Force | Out-Null
   Write-Host "Created .git/hooks" -ForegroundColor Green
 }
 
-# ---------- pre-commit（自动修复 + 重新stage + 快速编译） ----------
+# ---------- pre-commit (auto-fix format + restage + fast build) ----------
 $preCommit = @'
 #!/bin/sh
 echo "[pre-commit] dotnet format (auto-fix)..."
@@ -35,7 +35,7 @@ echo "[pre-commit] OK."
 Set-Content -Path ".git/hooks/pre-commit" -Value $preCommit -Encoding Ascii
 try { git update-index --chmod=+x .git/hooks/pre-commit | Out-Null } catch {}
 
-# ---------- pre-push 核心逻辑（PowerShell脚本） ----------
+# ---------- pre-push PowerShell core logic ----------
 $prePushPs1 = @'
 param(
   [string]$Solution = "{SLN}",
@@ -57,18 +57,38 @@ if ($LASTEXITCODE -ne 0) { Fail "Build failed." }
 # Prefer local dotnet tool; fallback to global
 function RunCoverage {
   param([string[]]$Args)
-  $p = Start-Process -FilePath "dotnet" -ArgumentList @("tool","run","dotnet-coverage") + $Args -NoNewWindow -Wait -PassThru -ErrorAction SilentlyContinue
-  if ($p.ExitCode -eq 0) { return 0 }
-  $p2 = Start-Process -FilePath "dotnet-coverage" -ArgumentList $Args -NoNewWindow -Wait -PassThru -ErrorAction SilentlyContinue
-  return $p2.ExitCode
+
+  # Remove null/empty args to avoid validation errors
+  $argsClean = @($Args | Where-Object { $_ -ne $null -and $_ -ne "" })
+
+  # Try local tool: dotnet tool run dotnet-coverage ...
+  $cmd1 = @("tool","run","dotnet-coverage") + $argsClean
+  & dotnet @cmd1
+  if ($LASTEXITCODE -eq 0) { return 0 }
+
+  # Fallback: global dotnet-coverage ...
+  if (Get-Command dotnet-coverage -ErrorAction SilentlyContinue) {
+    & dotnet-coverage @argsClean
+    return $LASTEXITCODE
+  }
+
+  Write-Host "dotnet-coverage not found (local or global)." -ForegroundColor Red
+  return 1
 }
+
+# Ensure local tools are restored (no-op if already restored)
+dotnet tool restore | Out-Null
 
 $covDir = Join-Path (Get-Location) "coverage"
 if (-not (Test-Path $covDir)) { New-Item -ItemType Directory -Path $covDir | Out-Null }
 $covFile = Join-Path $covDir "coverage.cobertura.xml"
 
 Write-Host "[pre-push] Tests + coverage (Cobertura)..." -ForegroundColor Cyan
-$exit = RunCoverage @("collect","-o",$covFile,"-f","cobertura","dotnet","test",$Solution,"-c","Release","--no-build")
+$covArgs = @(
+  "collect","-o",$covFile,"-f","cobertura",
+  "dotnet","test",$Solution,"-c","Release","--no-build"
+)
+$exit = RunCoverage -Args $covArgs
 if ($exit -ne 0) { Fail "dotnet-coverage or tests failed." }
 if (-not (Test-Path $covFile)) { Fail "Coverage file not found: $covFile" }
 
@@ -81,7 +101,7 @@ if ($xml.coverage.packages.package.classes.class) {
 }
 if (-not $classes -or $classes.Count -eq 0) { Fail "No classes found in coverage report." }
 
-# 匹配 Controllers/ 与 Service(s)/（兼容 \ 与 /）
+# Match Controllers/ and Service(s)/ (handles both '\' and '/')
 $pattern = '(\\|/)Controllers(\\|/)|(\\|/)Services?(\\|/)'
 $targetClasses = $classes | Where-Object { $_.filename -match $pattern }
 if (-not $targetClasses -or $targetClasses.Count -eq 0) {
@@ -95,7 +115,7 @@ foreach ($cls in $targetClasses) {
     $total += $lines.Count
     $covered += (@($lines | Where-Object { [int]($_.hits) -gt 0 })).Count
   } elseif ($cls.'line-rate') {
-    # Fallback（极少见）
+    # Rare fallback: synthesize weight by line-rate
     $total += 100
     $covered += [int](100 * [double]$cls.'line-rate')
   }
@@ -114,7 +134,7 @@ Write-Host "[pre-push] OK. Coverage gate passed." -ForegroundColor Green
 
 Set-Content -Path ".git/hooks/pre-push.ps1" -Value $prePushPs1 -Encoding UTF8
 
-# ---------- pre-push（bash包装器，调用上面的 ps1） ----------
+# ---------- pre-push shim (bash) that calls the PowerShell script ----------
 $prePushShim = @'
 #!/bin/sh
 if command -v pwsh >/dev/null 2>&1; then
