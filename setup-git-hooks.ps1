@@ -70,25 +70,27 @@ if ($unitTestProjects.Count -gt 1) {
   $unitTestProjects | ForEach-Object { Write-Host "  - $_" -ForegroundColor DarkYellow }
 }
 
-# IMPORTANT: now this is a path string, not a single character
 $unitProj = $unitTestProjects[0]
 Write-Host "[pre-push] Unit tests project: $unitProj" -ForegroundColor Yellow
 
+# Check if we have any Controllers or Services code
+$apiProjectPath = Join-Path (Get-Location) "src\MeetlyOmni.Api"
+$controllersPath = Join-Path $apiProjectPath "Controllers"
+$servicesPath = Join-Path $apiProjectPath "Service"
 
-# Prefer local dotnet tool; fallback to global
-function RunCoverage {
-  param([string[]]$Args)
-  # Try local tool
-  & dotnet @("tool","run","dotnet-coverage") @Args
-  if ($LASTEXITCODE -eq 0) { return 0 }
-  # Fallback to global
-  if (Get-Command dotnet-coverage -ErrorAction SilentlyContinue) {
-    & dotnet-coverage @Args
-    return $LASTEXITCODE
-  }
-  Write-Host "dotnet-coverage not found (local or global)." -ForegroundColor Red
-  return 1
+$hasControllers = (Test-Path $controllersPath) -and ((Get-ChildItem $controllersPath -Filter "*.cs" -Recurse | Measure-Object).Count -gt 0)
+$hasServices = (Test-Path $servicesPath) -and ((Get-ChildItem $servicesPath -Filter "*.cs" -Recurse | Measure-Object).Count -gt 0)
+
+if (-not $hasControllers -and -not $hasServices) {
+  Write-Host "[pre-push] No Controllers or Services code found. Running basic tests only..." -ForegroundColor Yellow
+  Write-Host "[pre-push] Running unit tests..." -ForegroundColor Cyan
+  dotnet test $unitProj -c Release --no-build
+  if ($LASTEXITCODE -ne 0) { Fail "Unit tests failed." }
+  Write-Host "[pre-push] OK. Basic checks passed (coverage check skipped - no business logic code)." -ForegroundColor Green
+  exit 0
 }
+
+Write-Host "[pre-push] Controllers/Services code detected. Running full coverage check..." -ForegroundColor Cyan
 
 # Ensure local tools are restored (no-op if already restored)
 dotnet tool restore | Out-Null
@@ -102,15 +104,8 @@ Write-Host "[pre-push] Unit tests + coverage (Cobertura)..." -ForegroundColor Cy
 # Build the test command as ONE string (only the Unit tests project)
 $testCmd = "dotnet test `"$unitProj`" -c Release --no-build"
 
-# dotnet-coverage: pass the command as a single argument to 'collect'
-$covArgs = @(
-  "collect",
-  $testCmd,
-  "-f","cobertura",
-  "-o",$covFile
-)
-
-$exit = RunCoverage -Args $covArgs
+# Use dotnet-coverage directly with the command
+$exit = & dotnet-coverage collect "$testCmd" -f cobertura -o $covFile
 if ($exit -ne 0) { Fail "dotnet-coverage or tests failed." }
 if (-not (Test-Path $covFile)) { Fail "Coverage file not found: $covFile" }
 
@@ -174,6 +169,6 @@ fi
 Set-Content -Path ".git/hooks/pre-push" -Value $prePushShim -Encoding Ascii
 try { git update-index --chmod=+x .git/hooks/pre-push | Out-Null } catch {}
 
-Write-Host "Git hooks setup completed." -ForegroundColor Green
+Write-Host "Smart Git hooks setup completed." -ForegroundColor Green
 Write-Host " - pre-commit: auto-fix format + restage + fast build" -ForegroundColor White
-Write-Host " - pre-push: verify-only format + Unit tests + coverage >= $Threshold% (Controllers/Services)" -ForegroundColor White
+Write-Host (" - pre-push: smart coverage check (skips when no Controllers/Services, enforces {0}% when present)" -f $Threshold) -ForegroundColor White
