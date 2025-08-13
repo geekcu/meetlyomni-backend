@@ -73,7 +73,11 @@ using (var scope = app.Services.CreateScope())
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogInformation("Starting database initialization...");
 
-        // 确保角色存在
+        // Ensure database is created and migrations are applied
+        var dbContext = services.GetRequiredService<ApplicationDbContext>();
+        await dbContext.Database.MigrateAsync();
+
+        // Ensure roles are seeded
         await ApplicationDbInitializer.SeedRolesAsync(services);
         logger.LogInformation("Database initialization completed successfully.");
     }

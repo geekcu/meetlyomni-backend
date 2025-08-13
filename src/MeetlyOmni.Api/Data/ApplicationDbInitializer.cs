@@ -55,7 +55,7 @@ public static class ApplicationDbInitializer
     }
 }
 
-// 用于 ILogger 注入上下文
+// Using for logging purposes
 public class ApplicationDbInitializerLog
 {
 }

@@ -14,9 +14,6 @@ public class ApplicationRoleConfiguration : IEntityTypeConfiguration<Application
 {
     public void Configure(EntityTypeBuilder<ApplicationRole> builder)
     {
-        // 设置表名为 Roles 而不是默认的 AspNetRoles
-        builder.ToTable("Roles");
-
         builder.Property(r => r.Id)
                .HasDefaultValueSql("gen_random_uuid()")
                .IsRequired();
@@ -25,9 +22,14 @@ public class ApplicationRoleConfiguration : IEntityTypeConfiguration<Application
         builder.ConfigureString(r => r.NormalizedName, maxLength: 100);
         builder.ConfigureString(r => r.Description, maxLength: 500, isRequired: false);
 
-        // 为 ConcurrencyStamp 设置默认值
+        // setup default value for ConcurrencyStamp
         builder.Property(r => r.ConcurrencyStamp)
                .HasDefaultValueSql("gen_random_uuid()::text")
                .IsRequired();
+
+        // Ensure uniqueness per ASP.NET Identity defaults
+        builder.HasIndex(r => r.NormalizedName)
+                       .HasDatabaseName("RoleNameIndex")
+                       .IsUnique();
     }
 }

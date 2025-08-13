@@ -41,5 +41,12 @@ public class RaffleTicketConfiguration : IEntityTypeConfiguration<RaffleTicket>
         builder.HasOne(r => r.Organization)
                .WithMany(o => o.RaffleTickets)
                .HasForeignKey(r => r.OrgId);
+
+        // Performance indexes
+        builder.HasIndex(r => r.MemberId)
+               .HasDatabaseName("IX_RaffleTicket_MemberId");
+
+        builder.HasIndex(r => r.OrgId)
+               .HasDatabaseName("IX_RaffleTicket_OrgId");
     }
 }
