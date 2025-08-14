@@ -61,6 +61,11 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
                .HasDatabaseName("UserNameIndex")
                .IsUnique(false);
 
+        // Enforce username uniqueness within organization
+        builder.HasIndex(m => new { m.OrgId, m.NormalizedUserName })
+               .IsUnique()
+               .HasDatabaseName("UK_Member_Org_NormalizedUserName");
+
         // Performance optimization indexes
         builder.HasIndex(m => m.Status)
                .HasDatabaseName("IX_Member_Status");
