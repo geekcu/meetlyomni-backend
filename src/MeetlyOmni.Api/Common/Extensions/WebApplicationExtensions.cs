@@ -15,7 +15,7 @@ public static class WebApplicationExtensions
     /// <summary>
     /// Applies database migrations and seeds initial data.
     /// </summary>
-    /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous operation.</placeholder></returns>
+    /// <returns>A <see cref="Task"/> that completes when the database migration and seeding process finishes.</returns>
     public static async Task InitializeDatabaseAsync(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
