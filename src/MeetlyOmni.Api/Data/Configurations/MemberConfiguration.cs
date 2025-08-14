@@ -66,6 +66,11 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
                .IsUnique()
                .HasDatabaseName("UK_Member_Org_NormalizedUserName");
 
+        // Enforce global, case-insensitive email uniqueness per Identity normalization
+        builder.HasIndex(m => m.NormalizedEmail)
+               .HasDatabaseName("EmailIndex")
+               .IsUnique();
+
         // Performance optimization indexes
         builder.HasIndex(m => m.Status)
                .HasDatabaseName("IX_Member_Status");
