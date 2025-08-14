@@ -15,9 +15,6 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
 {
     public void Configure(EntityTypeBuilder<Member> builder)
     {
-        // using Members instead of AspNetUsers
-        builder.ToTable("Members");
-
         builder.Property(m => m.Id)
                .HasDefaultValueSql("gen_random_uuid()")
                .IsRequired();
@@ -57,11 +54,11 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
         // Business unique constraints - these are the natural keys for SaaS login
         builder.HasIndex(m => new { m.OrgId, m.LocalMemberNumber })
                .IsUnique()
-               .HasDatabaseName("UK_Member_Org_LocalNumber");
+               .HasDatabaseName("UK_Member_Org_LocalMemberNumber");
 
-        builder.HasIndex(m => new { m.OrgId, m.Email })
+        builder.HasIndex(m => new { m.OrgId, m.NormalizedEmail })
                .IsUnique()
-               .HasDatabaseName("UK_Member_Org_Email");
+               .HasDatabaseName("UK_Member_Org_NormalizedEmail");
 
         // Performance optimization indexes
         builder.HasIndex(m => m.Status)
