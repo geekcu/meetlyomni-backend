@@ -22,11 +22,11 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
         builder.Property(m => m.OrgId).IsRequired();
         builder.Property(m => m.LocalMemberNumber).IsRequired();
 
-        builder.ConfigureString(m => m.Email, maxLength: 255);
+        builder.ConfigureString(m => m.Email, maxLength: 256);
 
-        builder.ConfigureString(m => m.PasswordHash, maxLength: 255);
+        // Align with ASP.NET Identity defaults (avoid constraining hash length)
         builder.Property(m => m.UserName)
-            .HasMaxLength(100);
+            .HasMaxLength(256);
         builder.ConfigureString(m => m.PhoneNumber, maxLength: 20, isRequired: false);
         builder.ConfigureString(m => m.LanguagePref, maxLength: 10);
 
@@ -56,9 +56,10 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
                .IsUnique()
                .HasDatabaseName("UK_Member_Org_LocalMemberNumber");
 
-        builder.HasIndex(m => new { m.OrgId, m.NormalizedEmail })
-               .IsUnique()
-               .HasDatabaseName("UK_Member_Org_NormalizedEmail");
+        // Restore Identity's default unique username index (global uniqueness)
+        builder.HasIndex(m => m.NormalizedUserName)
+               .HasDatabaseName("UserNameIndex")
+               .IsUnique();
 
         // Performance optimization indexes
         builder.HasIndex(m => m.Status)
