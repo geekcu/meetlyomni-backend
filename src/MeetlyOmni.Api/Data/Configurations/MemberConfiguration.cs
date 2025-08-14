@@ -23,6 +23,9 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
         builder.Property(m => m.LocalMemberNumber).IsRequired();
 
         builder.ConfigureString(m => m.Email, maxLength: 256);
+        builder.Property(m => m.NormalizedEmail)
+               .HasMaxLength(256)
+               .IsRequired();
 
         // Align with ASP.NET Identity defaults (avoid constraining hash length)
         builder.Property(m => m.UserName)
