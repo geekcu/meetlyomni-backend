@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
+using Npgsql.EntityFrameworkCore.PostgreSQL;
+
 namespace MeetlyOmni.Api.Common.Extensions;
 
 public static class WebApplicationExtensions
@@ -46,8 +48,15 @@ public static class WebApplicationExtensions
 
             if (useAdvisoryLock)
             {
-                logger.LogInformation("Acquiring advisory lock {Key}...", advisoryLockKey);
-                await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_lock({0});", advisoryLockKey);
+                if (db.Database.IsNpgsql())
+                {
+                    logger.LogInformation("Acquiring PostgreSQL advisory lock {Key}...", advisoryLockKey);
+                    await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_lock({0});", advisoryLockKey);
+                }
+                else
+                {
+                    logger.LogWarning("UseAdvisoryLock=true but the EF provider is not PostgreSQL. Skipping advisory lock.");
+                }
             }
 
             if (applyMigrations)
@@ -78,8 +87,15 @@ public static class WebApplicationExtensions
             {
                 if (useAdvisoryLock && db is not null)
                 {
-                    logger.LogInformation("Releasing advisory lock {Key}...", advisoryLockKey);
-                    await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_unlock({0});", advisoryLockKey);
+                    if (db.Database.IsNpgsql())
+                    {
+                        logger.LogInformation("Releasing PostgreSQL advisory lock {Key}...", advisoryLockKey);
+                        await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_unlock({0});", advisoryLockKey);
+                    }
+                    else
+                    {
+                        logger.LogDebug("Skipping advisory unlock because provider is not PostgreSQL.");
+                    }
                 }
             }
             catch (Exception unlockEx)

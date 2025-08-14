@@ -56,10 +56,10 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
                .IsUnique()
                .HasDatabaseName("UK_Member_Org_LocalMemberNumber");
 
-        // Restore Identity's default unique username index (global uniqueness)
+        // Allow global duplicate usernames (email remains globally unique)
         builder.HasIndex(m => m.NormalizedUserName)
                .HasDatabaseName("UserNameIndex")
-               .IsUnique();
+               .IsUnique(false);
 
         // Performance optimization indexes
         builder.HasIndex(m => m.Status)
