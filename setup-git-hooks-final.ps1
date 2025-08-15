@@ -92,7 +92,7 @@ if (-not $hasControllers -and -not $hasServices) {
   dotnet test $unitProj -c Release --no-build
   if ($LASTEXITCODE -ne 0) { Fail "Unit tests failed." }
   
-  # 显示测试结果摘要
+  # display test result
   Write-Host "`n[pre-push] ===== TEST SUMMARY =====" -ForegroundColor Cyan
   Write-Host "[pre-push] PASS: Basic tests passed" -ForegroundColor Green
   Write-Host "[pre-push] INFO: Coverage check: SKIPPED (no Controllers/Services code)" -ForegroundColor Yellow
@@ -149,7 +149,7 @@ if ($exit -ne 0) {
   dotnet test $unitProj -c Release --no-build
   if ($LASTEXITCODE -ne 0) { Fail "Unit tests failed." }
   
-  # 即使覆盖率工具失败，也尝试读取现有的覆盖率报告
+  # even if the coverage tool failed, we still want to check if we have an existing coverage report
   if (Test-Path $covFile) {
     Write-Host "[pre-push] Found existing coverage report, analyzing..." -ForegroundColor Yellow
   } else {
@@ -214,14 +214,14 @@ if ($total -le 0) {
 
 $rate = [math]::Round(100.0 * $covered / $total, 2)
 
-# 显示详细的覆盖率信息
+# display coverage report summary
 Write-Host "`n[pre-push] ===== COVERAGE REPORT =====" -ForegroundColor Cyan
 Write-Host ("[pre-push] Current Coverage: {0}%" -f $rate) -ForegroundColor Yellow
 Write-Host ("[pre-push] Required Coverage: {0}%" -f $Threshold) -ForegroundColor Yellow
 Write-Host ("[pre-push] Lines Covered: {0} / {1}" -f $covered, $total) -ForegroundColor White
 Write-Host ("[pre-push] Lines Remaining: {0}" -f ($total - $covered)) -ForegroundColor White
 
-# 显示覆盖率状态
+# display pass/fail message
 if ($rate -ge $Threshold) {
   Write-Host ("[pre-push] PASS: Coverage PASSED ({0}% >= {1}%)" -f $rate, $Threshold) -ForegroundColor Green
 } else {
