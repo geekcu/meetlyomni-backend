@@ -43,6 +43,7 @@ dotnet run --project src/MeetlyOmni.Api
 - **Setup hooks**: `.\setup-git-hooks-final.ps1`
 - **Pre-commit**: Auto-formats code and runs build
 - **Pre-push**: Runs tests and coverage checks
+ - macOS: `bash setup-git-hooks-mac.sh`
 
 ### User Secrets
 - **Set secret**: `dotnet user-secrets set "Key" "Value"`
