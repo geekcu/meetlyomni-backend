@@ -2,12 +2,11 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-namespace MeetlyOmni.Api.Common.Enums.Event
+namespace MeetlyOmni.Api.Common.Enums.Event;
+
+public enum EventStatus
 {
-    public enum EventStatus
-    {
-        Draft,
-        Live,
-        Ended,
-    }
+    Draft,
+    Live,
+    Ended,
 }

@@ -2,29 +2,27 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-namespace MeetlyOmni.Api.Data.Entities
+using System.Text.Json.Nodes;
+
+using MeetlyOmni.Api.Common.Enums.Game;
+
+namespace MeetlyOmni.Api.Data.Entities;
+public class Game
 {
-    using System.Text.Json.Nodes;
+    public Guid GameId { get; set; }
 
-    using MeetlyOmni.Api.Common.Enums.Game;
+    public GameType Type { get; set; }
 
-    public class Game
-    {
-        public Guid GameId { get; set; }
+    public string? Title { get; set; }
 
-        public GameType Type { get; set; }
+    public JsonObject? Config { get; set; }
 
-        public string? Title { get; set; }
+    public Guid? CreatedBy { get; set; }
 
-        public JsonObject? Config { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
-        public Guid? CreatedBy { get; set; }
+    // Navigation
+    public Member? Creator { get; set; }
 
-        public DateTimeOffset CreatedAt { get; set; }
-
-        // Navigation
-        public Member? Creator { get; set; }
-
-        public ICollection<EventGameInstance> EventGameInstances { get; set; } = new List<EventGameInstance>();
-    }
+    public ICollection<EventGameInstance> EventGameInstances { get; set; } = new List<EventGameInstance>();
 }

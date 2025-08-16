@@ -2,73 +2,86 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-namespace MeetlyOmni.Api.Data.Configurations
+using MeetlyOmni.Api.Common.Enums.Members;
+using MeetlyOmni.Api.Common.Extensions;
+using MeetlyOmni.Api.Data.Entities;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace MeetlyOmni.Api.Data.Configurations;
+
+public class MemberConfiguration : IEntityTypeConfiguration<Member>
 {
-    using MeetlyOmni.Api.Common.Enums.Members;
-    using MeetlyOmni.Api.Common.Extensions;
-    using MeetlyOmni.Api.Data.Entities;
-
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-    public class MemberConfiguration : IEntityTypeConfiguration<Member>
+    public void Configure(EntityTypeBuilder<Member> builder)
     {
-        public void Configure(EntityTypeBuilder<Member> builder)
-        {
-            // Primary key - UUID
-            builder.HasKey(m => m.Id);
-            builder.Property(m => m.Id)
-                   .HasDefaultValueSql("gen_random_uuid()")
-                   .IsRequired();
+        builder.Property(m => m.Id)
+               .HasDefaultValueSql("gen_random_uuid()")
+               .IsRequired();
 
-            builder.Property(m => m.OrgId).IsRequired();
-            builder.Property(m => m.LocalMemberNumber).IsRequired();
+        builder.Property(m => m.OrgId).IsRequired();
+        builder.Property(m => m.LocalMemberNumber).IsRequired();
 
-            builder.ConfigureString(m => m.Email, maxLength: 255);
-            builder.ConfigureString(m => m.PasswordHash, maxLength: 255);
-            builder.ConfigureString(m => m.Nickname, maxLength: 100, isRequired: false);
-            builder.ConfigureString(m => m.Phone, maxLength: 20, isRequired: false);
-            builder.ConfigureString(m => m.LanguagePref, maxLength: 10);
+        builder.ConfigureString(m => m.Email, maxLength: 256);
+        builder.Property(m => m.NormalizedEmail)
+               .HasMaxLength(256)
+               .IsRequired();
 
-            builder.ConfigureJsonbList(m => m.Tags);
+        // Align with ASP.NET Identity defaults (avoid constraining hash length)
+        builder.Property(m => m.UserName)
+            .HasMaxLength(256);
+        builder.ConfigureString(m => m.PhoneNumber, maxLength: 20, isRequired: false);
+        builder.ConfigureString(m => m.LanguagePref, maxLength: 10);
 
-            builder.Property(m => m.Points)
-                   .HasDefaultValue(0);
+        builder.ConfigureJsonbList(m => m.Tags);
 
-            builder.ConfigureEnumAsString(
-                m => m.Status,
-                maxLength: 20,
-                defaultValue: MemberStatus.Active);
+        builder.Property(m => m.Points)
+               .HasDefaultValue(0);
 
-            builder.Property(m => m.CreatedAt)
-                   .HasDefaultValueSql("NOW()");
+        builder.ConfigureEnumAsString(
+            m => m.Status,
+            maxLength: 20,
+            defaultValue: MemberStatus.Active);
 
-            builder.Property(m => m.UpdatedAt)
-                   .HasDefaultValueSql("NOW()");
+        builder.Property(m => m.CreatedAt)
+               .HasDefaultValueSql("NOW()");
 
-            // foreign key relationships
-            builder.HasOne(m => m.Organization)
-                   .WithMany(o => o.Members)
-                   .HasForeignKey(m => m.OrgId);
+        builder.Property(m => m.UpdatedAt)
+               .HasDefaultValueSql("NOW()");
 
-            // Business unique constraints - these are the natural keys for SaaS login
-            builder.HasIndex(m => new { m.OrgId, m.LocalMemberNumber })
-                   .IsUnique()
-                   .HasDatabaseName("UK_Member_Org_LocalNumber");
+        // foreign key relationships
+        builder.HasOne(m => m.Organization)
+               .WithMany(o => o.Members)
+               .HasForeignKey(m => m.OrgId);
 
-            builder.HasIndex(m => new { m.OrgId, m.Email })
-                   .IsUnique()
-                   .HasDatabaseName("UK_Member_Org_Email");
+        // Business unique constraints - these are the natural keys for SaaS login
+        builder.HasIndex(m => new { m.OrgId, m.LocalMemberNumber })
+               .IsUnique()
+               .HasDatabaseName("UK_Member_Org_LocalMemberNumber");
 
-            // Performance optimization indexes
-            builder.HasIndex(m => m.Status)
-                   .HasDatabaseName("IX_Member_Status");
+        // Allow global duplicate usernames (email remains globally unique)
+        builder.HasIndex(m => m.NormalizedUserName)
+               .HasDatabaseName("UserNameIndex")
+               .IsUnique(false);
 
-            builder.HasIndex(m => m.CreatedAt)
-                   .HasDatabaseName("IX_Member_CreatedAt");
+        // Enforce username uniqueness within organization
+        builder.HasIndex(m => new { m.OrgId, m.NormalizedUserName })
+               .IsUnique()
+               .HasDatabaseName("UK_Member_Org_NormalizedUserName");
 
-            builder.HasIndex(m => new { m.OrgId, m.Status })
-                   .HasDatabaseName("IX_Member_OrgId_Status");
-        }
+        // Enforce global, case-insensitive email uniqueness per Identity normalization
+        builder.HasIndex(m => m.NormalizedEmail)
+               .HasDatabaseName("EmailIndex")
+               .IsUnique();
+
+        // Performance optimization indexes
+        builder.HasIndex(m => m.Status)
+               .HasDatabaseName("IX_Member_Status");
+
+        builder.HasIndex(m => m.CreatedAt)
+               .HasDatabaseName("IX_Member_CreatedAt");
+
+        builder.HasIndex(m => new { m.OrgId, m.Status })
+               .HasDatabaseName("IX_Member_OrgId_Status");
     }
 }

@@ -2,13 +2,12 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-namespace MeetlyOmni.Api.Common.Enums.MemberActivityLog
+namespace MeetlyOmni.Api.Common.Enums.MemberActivityLog;
+
+public enum MemberEventType
 {
-    public enum MemberEventType
-    {
-        SignIn,
-        Quiz,
-        Vote,
-        Lottery,
-    }
+    SignIn,
+    Quiz,
+    Vote,
+    Lottery,
 }

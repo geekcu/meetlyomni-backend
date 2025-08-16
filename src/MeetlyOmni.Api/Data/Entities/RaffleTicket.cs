@@ -2,27 +2,25 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-namespace MeetlyOmni.Api.Data.Entities
+using MeetlyOmni.Api.Common.Enums.RaffleTicket;
+
+namespace MeetlyOmni.Api.Data.Entities;
+public class RaffleTicket
 {
-    using MeetlyOmni.Api.Common.Enums.RaffleTicket;
+    public Guid TicketId { get; set; }
 
-    public class RaffleTicket
-    {
-        public Guid TicketId { get; set; }
+    public Guid OrgId { get; set; }
 
-        public Guid OrgId { get; set; }
+    public Guid MemberId { get; set; }
 
-        public Guid MemberId { get; set; }
+    public RaffleIssuedSource? IssuedBy { get; set; }
 
-        public RaffleIssuedSource? IssuedBy { get; set; }
+    public RaffleTicketStatus Status { get; set; } = RaffleTicketStatus.Unused;
 
-        public RaffleTicketStatus Status { get; set; } = RaffleTicketStatus.Unused;
+    public DateTimeOffset IssueTime { get; set; }
 
-        public DateTimeOffset IssueTime { get; set; }
+    // Navigation
+    public Member? Member { get; set; }
 
-        // Navigation
-        public Member? Member { get; set; }
-
-        public Organization? Organization { get; set; }
-    }
+    public Organization? Organization { get; set; }
 }

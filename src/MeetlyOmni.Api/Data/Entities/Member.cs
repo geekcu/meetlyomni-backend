@@ -2,49 +2,39 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-namespace MeetlyOmni.Api.Data.Entities
+using MeetlyOmni.Api.Common.Enums.Members;
+
+using Microsoft.AspNetCore.Identity;
+
+namespace MeetlyOmni.Api.Data.Entities;
+public class Member : IdentityUser<Guid>
 {
-    using MeetlyOmni.Api.Common.Enums.Members;
+    public Guid OrgId { get; set; }
 
-    public class Member
-    {
-        public Guid Id { get; set; } = Guid.NewGuid();
+    public int LocalMemberNumber { get; set; }
 
-        public Guid OrgId { get; set; }
+    public string LanguagePref { get; set; } = "en";
 
-        public int LocalMemberNumber { get; set; }
+    public List<string> Tags { get; set; } = new();
 
-        public string Email { get; set; } = string.Empty;
+    public int Points { get; set; } = 0;
 
-        public string PasswordHash { get; set; } = string.Empty;
+    public MemberStatus Status { get; set; } = MemberStatus.Active;
 
-        public string? Nickname { get; set; }
+    public DateTimeOffset? LastLogin { get; set; }
 
-        public string? Phone { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
-        public string LanguagePref { get; set; } = "en";
+    public DateTimeOffset UpdatedAt { get; set; }
 
-        public List<string> Tags { get; set; } = new ();
+    // Navigation
+    public Organization? Organization { get; set; }
 
-        public int Points { get; set; } = 0;
+    public ICollection<MemberActivityLog> ActivityLogs { get; set; } = new List<MemberActivityLog>();
 
-        public MemberStatus Status { get; set; } = MemberStatus.Active;
+    public ICollection<RaffleTicket> RaffleTickets { get; set; } = new List<RaffleTicket>();
 
-        public DateTimeOffset? LastLogin { get; set; }
+    public ICollection<GameRecord> GameRecords { get; set; } = new List<GameRecord>();
 
-        public DateTimeOffset CreatedAt { get; set; }
-
-        public DateTimeOffset UpdatedAt { get; set; }
-
-        // Navigation
-        public Organization? Organization { get; set; }
-
-        public ICollection<MemberActivityLog> ActivityLogs { get; set; } = new List<MemberActivityLog>();
-
-        public ICollection<RaffleTicket> RaffleTickets { get; set; } = new List<RaffleTicket>();
-
-        public ICollection<GameRecord> GameRecords { get; set; } = new List<GameRecord>();
-
-        public ICollection<Game> CreatedGames { get; set; } = new List<Game>();
-    }
+    public ICollection<Game> CreatedGames { get; set; } = new List<Game>();
 }

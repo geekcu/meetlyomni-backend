@@ -2,8 +2,12 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
+using MeetlyOmni.Api.Common.Extensions;
 using MeetlyOmni.Api.Data;
+using MeetlyOmni.Api.Data.Entities;
 using MeetlyOmni.Api.Mapping;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +28,9 @@ if (string.IsNullOrEmpty(connectionString))
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+// Identity Services
+builder.Services.AddApplicationIdentity();
+
 // Health Check
 builder.Services.AddHealthChecks()
     .AddNpgSql(connectionString);
@@ -37,6 +44,9 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 
+// Database initialization
+await app.InitializeDatabaseAsync();
+
 // Swagger
 if (app.Environment.IsDevelopment())
 {
@@ -45,6 +55,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Authentication & Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

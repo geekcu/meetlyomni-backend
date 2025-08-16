@@ -2,12 +2,11 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-namespace MeetlyOmni.Api.Common.Enums.Members
+namespace MeetlyOmni.Api.Common.Enums.Members;
+
+public enum MemberStatus
 {
-    public enum MemberStatus
-    {
-        Active,
-        Inactive,
-        Banned,
-    }
+    Active,
+    Inactive,
+    Banned,
 }

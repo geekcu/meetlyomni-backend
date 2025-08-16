@@ -2,29 +2,27 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-namespace MeetlyOmni.Api.Data.Entities
+using System.Text.Json.Nodes;
+
+using MeetlyOmni.Api.Common.Enums.MemberActivityLog;
+
+namespace MeetlyOmni.Api.Data.Entities;
+public class MemberActivityLog
 {
-    using System.Text.Json.Nodes;
+    public Guid LogId { get; set; }
 
-    using MeetlyOmni.Api.Common.Enums.MemberActivityLog;
+    public Guid MemberId { get; set; }
 
-    public class MemberActivityLog
-    {
-        public Guid LogId { get; set; }
+    public Guid OrgId { get; set; }
 
-        public Guid MemberId { get; set; }
+    public MemberEventType EventType { get; set; }
 
-        public Guid OrgId { get; set; }
+    public JsonObject? EventDetail { get; set; }
 
-        public MemberEventType EventType { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
-        public JsonObject? EventDetail { get; set; }
+    // Navigation
+    public Member? Member { get; set; }
 
-        public DateTimeOffset CreatedAt { get; set; }
-
-        // Navigation
-        public Member? Member { get; set; }
-
-        public Organization? Organization { get; set; }
-    }
+    public Organization? Organization { get; set; }
 }

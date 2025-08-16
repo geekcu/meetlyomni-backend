@@ -2,12 +2,11 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-namespace MeetlyOmni.Api.Common.Enums.Organization
+namespace MeetlyOmni.Api.Common.Enums.Organization;
+
+public enum PlanType
 {
-    public enum PlanType
-    {
-        Free,
-        Pro,
-        Enterprise,
-    }
+    Free,
+    Pro,
+    Enterprise,
 }
