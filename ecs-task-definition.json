@@ -1,0 +1,45 @@
+{
+  "family": "meetlyomni-api-task",
+  "networkMode": "awsvpc",
+  "executionRoleArn": "arn:aws:iam::972502737060:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "meetlyomni-api",
+      "image": "972502737060.dkr.ecr.us-east-1.amazonaws.com/meetlyomni-backend:latest",
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "ASPNETCORE_ENVIRONMENT",
+          "value": "Development"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "ConnectionStrings__MeetlyOmniDb",
+          "valueFrom": "arn:aws:ssm:us-east-1:972502737060:parameter/ConnectionStrings__MeetlyOmniDb"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/meetlyomni-api",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "runtimePlatform": {
+    "operatingSystemFamily": "LINUX"
+  }
+}
