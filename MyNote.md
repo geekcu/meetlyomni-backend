@@ -1,8 +1,8 @@
 [2025-8-18 Note]
   - Rewrite Dockerfile 
   - Create an .env file, Add ConnectionStrings__MeetlyOmniDb
-  - Build Image: docker build -f src/MeetlyOmni.Api/Dockerfile . -t meetlyomni-api:latest --no-cache 
-  - Start new container: docker run -d --env-file .env -e ASPNETCORE_ENVIRONMENT=Development -p 5000:8080 --name meetlyomni-api meetlyomni-api:latest
+  - Build Image: docker build -f src/MeetlyOmni.Api/Dockerfile . -t meetlyomni-backend:latest --no-cache 
+  - Start new container: docker run -d --env-file .env -e ASPNETCORE_ENVIRONMENT=Development -p 5000:8080 --name meetlyomni-backend meetlyomni-backend:latest
   - Open Browser to verify:  http://localhost:5000/health & http://localhost:5000/swagger/index.html
 
 

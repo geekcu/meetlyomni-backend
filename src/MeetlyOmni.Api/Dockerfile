@@ -18,7 +18,7 @@ ENV PATH="$PATH:/root/.dotnet/tools"
 # Copy all source files
 COPY . .
 
-# Set working directory to project location
+# Set working directory to root
 WORKDIR /app
 
 # Debug: Final verification
