@@ -4,7 +4,7 @@
   "executionRoleArn": "arn:aws:iam::972502737060:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
-      "name": "meetlyomni-api",
+      "name": "meetlyomni-backend",
       "image": "972502737060.dkr.ecr.us-east-1.amazonaws.com/meetlyomni-backend:latest",
       "portMappings": [
         {
