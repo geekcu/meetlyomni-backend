@@ -3,9 +3,6 @@ name: Build and Deploy to ECS
 on:
   push:
     branches: [ devops-di ]
-  pull_request:
-    branches: [ devops-di ]
-
 permissions:
   contents: read
   id-token: write
