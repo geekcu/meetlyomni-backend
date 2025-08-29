@@ -1,5 +1,5 @@
 {
-  "family": "meetlyomni-api-task",
+  "family": "meetlyomni-backend-task",
   "networkMode": "awsvpc",
   "executionRoleArn": "arn:aws:iam::972502737060:role/ecsTaskExecutionRole",
   "containerDefinitions": [
@@ -29,7 +29,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/meetlyomni-api",
+          "awslogs-group": "/ecs/meetlyomni-backend",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }
