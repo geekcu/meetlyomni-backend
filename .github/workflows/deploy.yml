@@ -7,10 +7,10 @@ on:
     branches: [ devops-di ]
 
 env:
-  AWS_REGION: ${{ vars.AWS_REGION }}
-  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
-  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
-  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+  ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
+  ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
   IMAGE_TAG: ${{ github.sha }}
 
 permissions:
@@ -21,7 +21,6 @@ jobs:
   build-and-deploy:
     name: Build, Push, and Deploy
     runs-on: ubuntu-latest
-    environment: di
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,8 +28,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4.3.1
         with:
-          aws-region: ${{ vars.AWS_REGION }}
-          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::972502737060:role/GitHub-Deploy-Role
           role-session-name: deploy-${{ github.head_ref }}
 
       - name: Login to Amazon ECR
