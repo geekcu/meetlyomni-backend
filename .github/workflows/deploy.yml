@@ -46,11 +46,11 @@ jobs:
           GITHUB_WORKFLOW: ${{ github.workflow }}
           GITHUB_SHA: ${{ github.sha }}
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
-          role-session-name: deploy-${{ github.head_ref || 'main' }}
+          role-session-name: deploy-${{ github.head_ref }}
 
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
