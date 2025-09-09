@@ -2,12 +2,20 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+
+using Asp.Versioning.ApiExplorer;
+
 using MeetlyOmni.Api.Common.Options;
 using MeetlyOmni.Api.Service.AuthService.Interfaces;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace MeetlyOmni.Api.Common.Extensions;
 
@@ -32,12 +40,8 @@ public static class ServiceCollectionExtensions
         })
         .AddJwtBearer(options =>
         {
-            // Get configuration first
-            var jwtConfig = configuration.GetSection("Jwt").Get<JwtOptions>();
-            if (jwtConfig == null)
-            {
-                throw new InvalidOperationException("JWT configuration is missing or invalid.");
-            }
+            // Disable claim mapping to preserve raw JWT claim types
+            options.MapInboundClaims = false;
 
             // Configure basic validation parameters
             options.TokenValidationParameters = new TokenValidationParameters
@@ -46,13 +50,14 @@ public static class ServiceCollectionExtensions
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtConfig.Issuer,
-                ValidAudience = jwtConfig.Audience,
                 ClockSkew = TimeSpan.FromMinutes(1),
                 RequireExpirationTime = true,
                 RequireSignedTokens = true,
+                NameClaimType = "name", // Short claim name
+                RoleClaimType = "role", // Short claim name
 
                 // IssuerSigningKey will be set in events below
+                // ValidIssuer and ValidAudience will be set in events to use injected options
             };
 
             // Improved event handling with cookie support
@@ -60,18 +65,33 @@ public static class ServiceCollectionExtensions
             {
                 OnMessageReceived = context =>
                 {
+                    // Clone to avoid cross-request races when mutating validation parameters
+                    context.Options.TokenValidationParameters =
+                        context.Options.TokenValidationParameters.Clone();
+
                     // Set the signing key at runtime to avoid BuildServiceProvider
                     var keyProvider = context.HttpContext.RequestServices.GetRequiredService<IJwtKeyProvider>();
                     context.Options.TokenValidationParameters.IssuerSigningKey = keyProvider.GetValidationKey();
 
-                    // Check for JWT token in Authorization header first (standard bearer token)
-                    if (string.IsNullOrEmpty(context.Token))
+                    // Set issuer and audience from injected options to ensure consistency
+                    var jwtOptions = context.HttpContext.RequestServices.GetRequiredService<Microsoft.Extensions.Options.IOptions<JwtOptions>>();
+                    context.Options.TokenValidationParameters.ValidIssuer = jwtOptions.Value.Issuer;
+                    context.Options.TokenValidationParameters.ValidAudience = jwtOptions.Value.Audience;
+
+                    // 1) priority: Authorization header (for script/mobile/Postman)
+                    var auth = context.Request.Headers["Authorization"].ToString();
+                    if (!string.IsNullOrWhiteSpace(auth) &&
+                        auth.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
                     {
-                        // If no bearer token, try to get token from cookie
-                        if (context.Request.Cookies.TryGetValue("access_token", out var cookieToken))
-                        {
-                            context.Token = cookieToken;
-                        }
+                        context.Token = auth.Substring("Bearer ".Length).Trim();
+                        return Task.CompletedTask;
+                    }
+
+                    // 2) backup: cookie (for browser auto-carry)
+                    if (context.Request.Cookies.TryGetValue(AuthCookieExtensions.CookieNames.AccessToken, out var cookieToken) &&
+                        !string.IsNullOrWhiteSpace(cookieToken))
+                    {
+                        context.Token = cookieToken;
                     }
 
                     return Task.CompletedTask;
@@ -82,6 +102,10 @@ public static class ServiceCollectionExtensions
                     if (context.Exception is SecurityTokenExpiredException ste)
                     {
                         logger.LogWarning("JWT authentication failed: token expired at {Expires}.", ste.Expires);
+                    }
+                    else if (context.Exception is Microsoft.IdentityModel.Tokens.SecurityTokenInvalidAudienceException)
+                    {
+                        logger.LogError("JWT authentication failed: Invalid audience");
                     }
                     else
                     {
@@ -95,7 +119,7 @@ public static class ServiceCollectionExtensions
                     var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
                     logger.LogDebug(
                         "JWT token validated for user: {UserId}",
-                        context.Principal?.FindFirst("sub")?.Value);
+                        context.Principal?.FindFirstValue("sub"));
                     return Task.CompletedTask;
                 },
             };
@@ -110,7 +134,7 @@ public static class ServiceCollectionExtensions
     /// <param name="services">The service collection.</param>
     /// <param name="allowedOrigins">Array of allowed origins. If null, uses default development origins.</param>
     /// <returns>The service collection for chaining.</returns>
-    public static IServiceCollection AddCorsWithCookieSupport(this IServiceCollection services, string[] ? allowedOrigins = null)
+    public static IServiceCollection AddCorsWithCookieSupport(this IServiceCollection services, string[]? allowedOrigins = null)
     {
         var origins = allowedOrigins ?? new[]
         {
@@ -135,46 +159,54 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Configures Swagger/OpenAPI with JWT Bearer authentication support.
+    /// Configures Swagger/OpenAPI with API versioning support.
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <param name="title">API title. Defaults to "MeetlyOmni API".</param>
-    /// <param name="version">API version. Defaults to "v1".</param>
     /// <returns>The service collection for chaining.</returns>
-    public static IServiceCollection AddSwaggerWithJwtAuth(this IServiceCollection services, string title = "MeetlyOmni API", string version = "v1")
+    public static IServiceCollection AddSwaggerWithApiVersioning(this IServiceCollection services, string title = "MeetlyOmni API")
     {
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(c =>
+        services.AddSwaggerGen(options =>
         {
-            c.SwaggerDoc(version, new OpenApiInfo { Title = title, Version = version });
+            // Documents configured via IConfigureOptions<SwaggerGenOptions> to avoid building the provider here.
+            // Add operation filter to handle API versioning
+            options.OperationFilter<SwaggerDefaultValues>();
 
-            // JWT auth configuration for Swagger UI
-            var bearerSecurityScheme = new OpenApiSecurityScheme
+            // JWT security for Swagger UI
+            var bearerScheme = new OpenApiSecurityScheme
             {
-                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
                 Name = "Authorization",
+                Description = "Enter 'Bearer {token}'",
                 In = ParameterLocation.Header,
                 Type = SecuritySchemeType.Http,
                 Scheme = "bearer",
                 BearerFormat = "JWT",
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" },
             };
-            c.AddSecurityDefinition("Bearer", bearerSecurityScheme);
+            options.AddSecurityDefinition("Bearer", bearerScheme);
 
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            // CSRF security for Swagger UI
+            var csrfScheme = new OpenApiSecurityScheme
             {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
+                Name = "X-XSRF-TOKEN",
+                Description = "CSRF token for POST/PUT/PATCH/DELETE requests",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "XSRF" },
+            };
+            options.AddSecurityDefinition("XSRF", csrfScheme);
+
+            // Apply both JWT and CSRF security requirements
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
                         {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer",
-                        },
-                    },
-                    Array.Empty<string>()
-                },
-            });
+                { bearerScheme, Array.Empty<string>() },
+                { csrfScheme, Array.Empty<string>() },
+                        });
         });
+
+        services.AddTransient<IConfigureOptions<SwaggerGenOptions>>(
+            sp => new ConfigureSwaggerOptions(sp.GetRequiredService<IApiVersionDescriptionProvider>(), title));
 
         return services;
     }

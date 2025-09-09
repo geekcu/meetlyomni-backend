@@ -97,4 +97,46 @@ public static class TestDataHelper
             Password = "TestPassword123!",
         };
     }
+
+    /// <summary>
+    /// Creates a test refresh token entity.
+    /// </summary>
+    /// <returns>A RefreshToken entity with test data.</returns>
+    public static RefreshToken CreateTestRefreshToken()
+    {
+        return new RefreshToken
+        {
+            Id = Guid.NewGuid(),
+            TokenHash = "test-refresh-token-hash",
+            UserId = Guid.NewGuid(),
+            FamilyId = Guid.NewGuid(),
+            ExpiresAt = DateTimeOffset.UtcNow.AddDays(30),
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-1),
+            IpAddress = "192.168.1.100",
+            UserAgent = "TestUserAgent/1.0",
+            RevokedAt = null
+        };
+    }
+
+    /// <summary>
+    /// Creates an expired refresh token entity.
+    /// </summary>
+    /// <returns>A RefreshToken entity that has expired.</returns>
+    public static RefreshToken CreateExpiredRefreshToken()
+    {
+        var token = CreateTestRefreshToken();
+        token.ExpiresAt = DateTimeOffset.UtcNow.AddDays(-1); // Expired
+        return token;
+    }
+
+    /// <summary>
+    /// Creates a revoked refresh token entity.
+    /// </summary>
+    /// <returns>A RefreshToken entity that has been revoked.</returns>
+    public static RefreshToken CreateRevokedRefreshToken()
+    {
+        var token = CreateTestRefreshToken();
+        token.RevokedAt = DateTimeOffset.UtcNow.AddMinutes(-5); // Revoked
+        return token;
+    }
 }

@@ -1,25 +1,49 @@
-﻿// <copyright file="AuthController.cs" company="MeetlyOmni">
+// <copyright file="AuthController.cs" company="MeetlyOmni">
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
+using System.Security.Claims;
+
+using Asp.Versioning;
+
+using MeetlyOmni.Api.Common.Constants;
+using MeetlyOmni.Api.Common.Extensions;
+using MeetlyOmni.Api.Middlewares.Antiforgery;
 using MeetlyOmni.Api.Models.Auth;
 using MeetlyOmni.Api.Service.AuthService.Interfaces;
+using MeetlyOmni.Api.Service.Common.Interfaces;
 
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MeetlyOmni.Api.Controllers;
 
-[Route("api/[controller]")]
+/// <summary>
+/// Controller responsible for all authentication and authorization operations.
+/// </summary>
+[Route("api/v{version:apiVersion}/auth")]
 [ApiController]
+[ApiVersion("1.0")]
 public class AuthController : ControllerBase
 {
-    private readonly IAuthService _authService;
+    private readonly ILoginService _loginService;
+    private readonly ITokenService _tokenService;
+    private readonly IClientInfoService _clientInfoService;
+    private readonly IAntiforgery _antiforgery;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IAuthService authService, ILogger<AuthController> logger)
+    public AuthController(
+        ILoginService loginService,
+        ITokenService tokenService,
+        IClientInfoService clientInfoService,
+        IAntiforgery antiforgery,
+        ILogger<AuthController> logger)
     {
-        _authService = authService;
+        _loginService = loginService;
+        _tokenService = tokenService;
+        _clientInfoService = clientInfoService;
+        _antiforgery = antiforgery;
         _logger = logger;
     }
 
@@ -33,69 +57,70 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> LoginAsync([FromBody] LoginRequest request, CancellationToken ct)
     {
-        if (!ModelState.IsValid)
+        var (userAgent, ipAddress) = _clientInfoService.GetClientInfo(HttpContext);
+        var result = await _loginService.LoginAsync(request, userAgent, ipAddress, ct);
+
+        Response.SetAccessTokenCookie(result.AccessToken, result.ExpiresAt);
+        Response.SetRefreshTokenCookie(result.RefreshToken, result.RefreshTokenExpiresAt);
+
+        _logger.LogInformation("User {Email} logged in.", request.Email);
+
+        return Ok(new LoginResponse
         {
-            return ValidationProblem(ModelState);
-        }
-
-        try
-        {
-            var response = await _authService.LoginAsync(request);
-
-            // Set JWT token in HttpOnly cookie
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true, // Prevent XSS attacks
-                Secure = !HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment(), // Only HTTPS in production
-                SameSite = SameSiteMode.Strict, // CSRF protection
-                Expires = response.ExpiresAt,
-                Path = "/",
-            };
-
-            Response.Cookies.Append("access_token", response.AccessToken, cookieOptions);
-
-            // Return response without the token (since it's now in cookie)
-            var cookieResponse = new LoginResponse
-            {
-                ExpiresAt = response.ExpiresAt,
-                TokenType = response.TokenType,
-
-                // AccessToken is intentionally omitted for cookie-based auth
-            };
-
-            return Ok(cookieResponse);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            _logger.LogWarning("Login failed for {Email}: {Message}", request.Email, ex.Message);
-
-            return Problem(
-                title: "Authentication Failed",
-                detail: ex.Message,
-                statusCode: StatusCodes.Status401Unauthorized);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unexpected error during login for {Email}", request.Email);
-
-            return Problem(
-                title: "Internal Server Error",
-                detail: "An unexpected error occurred",
-                statusCode: StatusCodes.Status500InternalServerError);
-        }
+            ExpiresAt = result.ExpiresAt,
+            TokenType = result.TokenType,
+        });
     }
 
     /// <summary>
-    /// Test endpoint to verify authentication via cookie is working.
+    /// Get CSRF token for form protection.
+    /// </summary>
+    /// <returns>CSRF token information.</returns>
+    [HttpGet("csrf")]
+    [AllowAnonymous]
+    [SkipAntiforgery]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    public IActionResult GetCsrf()
+    {
+        var tokens = _antiforgery.GetAndStoreTokens(HttpContext);
+        Response.SetCsrfTokenCookie(tokens.RequestToken ?? string.Empty);
+        return Ok(new { message = "CSRF token generated" });
+    }
+
+    /// <summary>
+    /// Refresh access token using refresh token.
+    /// </summary>
+    /// <returns>New access and refresh tokens.</returns>
+    [HttpPost("refresh")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> RefreshTokenAsync(CancellationToken ct)
+    {
+        var (userAgent, ipAddress) = _clientInfoService.GetClientInfo(HttpContext);
+        var (accessToken, accessTokenExpiresAt, newRefreshToken, newRefreshTokenExpiresAt) =
+            await _tokenService.RefreshTokenPairFromCookiesAsync(HttpContext, userAgent, ipAddress, ct);
+
+        Response.SetAccessTokenCookie(accessToken, accessTokenExpiresAt);
+        Response.SetRefreshTokenCookie(newRefreshToken, newRefreshTokenExpiresAt);
+
+        return Ok(new LoginResponse
+        {
+            ExpiresAt = accessTokenExpiresAt,
+            TokenType = "Bearer",
+        });
+    }
+
+    /// <summary>
+    /// Get current user information from JWT token.
     /// </summary>
     /// <returns>Current user information.</returns>
     [HttpGet("me")]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     public IActionResult GetCurrentUser()
     {
         var userId = User.FindFirst("sub")?.Value;
@@ -104,9 +129,9 @@ public class AuthController : ControllerBase
 
         return Ok(new
         {
-            userId,
-            email,
-            orgId,
+            userId = User.FindFirstValue(JwtClaimTypes.Subject),
+            email = User.FindFirstValue(JwtClaimTypes.Email),
+            orgId = User.FindFirstValue(JwtClaimTypes.OrganizationId),
             message = "Authentication via cookie is working!",
         });
     }
