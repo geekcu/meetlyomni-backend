@@ -1,0 +1,60 @@
+name: Terraform Destroy Resources
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to destroy (dev, staging, prod)'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  AWS_OIDC_PROVIDER_ARN: ${{ vars.AWS_OIDC_PROVIDER_ARN }}
+  AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+  TF_WORKSPACE: ${{ github.event.inputs.environment }}
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  terraform-destroy:
+    name: Terraform Destroy Infrastructure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4.3.1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          role-session-name: terraform-destroy-${{ github.head_ref }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.13.2
+
+      - name: Terraform Init
+        run: terraform init -backend-config="bucket=meetlyomni-tf-state-bucket-${{ env.TF_WORKSPACE }}" -backend-config="key=${{ env.TF_WORKSPACE }}/terraform.tfstate" -backend-config="dynamodb_table=terraform-state-locks-${{ env.TF_WORKSPACE }}" -backend-config="region=${{ env.AWS_REGION }}"
+        working-directory: ./terraform
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ./terraform
+
+      - name: Terraform Plan Destroy
+        run: terraform plan -destroy -out=tfdestroyplan
+        working-directory: ./terraform
+
+      - name: Terraform Destroy
+        run: terraform apply -auto-approve tfdestroyplan
+        working-directory: ./terraform
