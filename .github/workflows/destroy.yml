@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to destroy (dev, staging, prod)'
+        description: 'Environment to destroy (dev)'
         required: true
         default: 'dev'
         type: choice
@@ -24,6 +24,9 @@ permissions:
 
 jobs:
   terraform-destroy:
+    env:
+      TF_WORKSPACE: ${{ github.event.inputs.environment }}
+
     name: Terraform Destroy Infrastructure
     runs-on: ubuntu-latest
     steps:
