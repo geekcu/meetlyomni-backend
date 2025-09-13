@@ -12,6 +12,9 @@ on:
           - dev
           - staging
           - prod
+  push:
+      branches:
+        - devops-di
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
