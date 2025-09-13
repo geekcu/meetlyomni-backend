@@ -16,8 +16,7 @@ env:
   AWS_REGION: ${{ vars.AWS_REGION }}
   AWS_OIDC_PROVIDER_ARN: ${{ vars.AWS_OIDC_PROVIDER_ARN }}
   AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
-  TF_WORKSPACE: ${{ github.event.inputs.environment }}
-
+  TF_WORKSPACE: dev
 permissions:
   contents: read
   id-token: write
@@ -25,7 +24,7 @@ permissions:
 jobs:
   terraform-destroy:
     env:
-      TF_WORKSPACE: ${{ github.event.inputs.environment }}
+      TF_WORKSPACE: dev
 
     name: Terraform Destroy Infrastructure
     runs-on: ubuntu-latest
