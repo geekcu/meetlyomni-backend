@@ -2,11 +2,10 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-namespace MeetlyOmni.Api.Common.Enums.RaffleTicket
+namespace MeetlyOmni.Api.Common.Enums.RaffleTicket;
+
+public enum RaffleTicketStatus
 {
-    public enum RaffleTicketStatus
-    {
-        Unused,
-        Used,
-    }
+    Unused,
+    Used,
 }

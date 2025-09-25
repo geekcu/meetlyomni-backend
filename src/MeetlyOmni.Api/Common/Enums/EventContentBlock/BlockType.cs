@@ -2,15 +2,14 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-namespace MeetlyOmni.Api.Common.Enums.EventContentBlock
+namespace MeetlyOmni.Api.Common.Enums.EventContentBlock;
+
+public enum BlockType
 {
-    public enum BlockType
-    {
-        Slide,
-        Iframe,
-        Video,
-        Text,
-        GuestIntro,
-        GameTrigger,
-    }
+    Slide,
+    Iframe,
+    Video,
+    Text,
+    GuestIntro,
+    GameTrigger,
 }

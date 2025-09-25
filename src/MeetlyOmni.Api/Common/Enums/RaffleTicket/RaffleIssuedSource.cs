@@ -2,13 +2,12 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-namespace MeetlyOmni.Api.Common.Enums.RaffleTicket
+namespace MeetlyOmni.Api.Common.Enums.RaffleTicket;
+
+public enum RaffleIssuedSource
 {
-    public enum RaffleIssuedSource
-    {
-        Signup,
-        Referral,
-        Share,
-        Quiz,
-    }
+    Signup,
+    Referral,
+    Share,
+    Quiz,
 }
