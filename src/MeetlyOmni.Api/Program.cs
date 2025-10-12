@@ -2,10 +2,12 @@
 // Copyright (c) MeetlyOmni. All rights reserved.
 // </copyright>
 
-using System.Buffers.Text;
 using System.IdentityModel.Tokens.Jwt;
 
 using Amazon;
+using Amazon.Runtime;
+using Amazon.Runtime.CredentialManagement;
+using Amazon.S3;
 using Amazon.SimpleEmailV2;
 
 using Asp.Versioning;
@@ -25,13 +27,43 @@ using MeetlyOmni.Api.Service.Common;
 using MeetlyOmni.Api.Service.Common.Interfaces;
 using MeetlyOmni.Api.Service.Email;
 using MeetlyOmni.Api.Service.Email.Interfaces;
+using MeetlyOmni.Api.Service.EventService;
+using MeetlyOmni.Api.Service.EventService.Interfaces;
+using MeetlyOmni.Api.Service.Invitation;
+using MeetlyOmni.Api.Service.Invitation.Interfaces;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using Npgsql;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = default(WebApplicationBuilder);
+
+try
+{
+    // Wrap CreateBuilder to provide clearer diagnostics when configuration files contain invalid JSON.
+    builder = WebApplication.CreateBuilder(args);
+}
+catch (InvalidDataException ex)
+{
+    Console.Error.WriteLine();
+    Console.Error.WriteLine("ERROR: Failed to load configuration files during application startup.");
+    Console.Error.WriteLine("Reason: " + ex.Message);
+
+    // Print inner exception details (often contains JSON parsing errors)
+    if (ex.InnerException is not null)
+    {
+        Console.Error.WriteLine();
+        Console.Error.WriteLine("Inner exception details:");
+        Console.Error.WriteLine(ex.InnerException.ToString());
+    }
+
+    Console.Error.WriteLine();
+    Console.Error.WriteLine("Please fix the JSON syntax in your appsettings*.json files (see stack trace above).");
+    Console.Error.WriteLine("Exiting with code 1.");
+    Environment.Exit(1);
+    throw; // unreachable, but keeps compiler happy
+}
 
 // Clear default JWT claim mappings to use standard claim names
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -95,6 +127,7 @@ builder.Services.AddAuthorization();
 
 // ---- Repositories ----
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 
@@ -104,6 +137,8 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ILogoutService, LogoutService>();
 builder.Services.AddScoped<ISignUpService, SignUpService>();
 builder.Services.AddScoped<IResetPasswordService, ResetPasswordService>();
+builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<IInvitationService, InvitationService>();
 
 // ---- Common Services ----
 builder.Services.AddScoped<IClientInfoService, ClientInfoService>();
@@ -123,6 +158,16 @@ builder.Services.AddHealthChecks()
     .AddNpgSql(connectionString);
 
 builder.Services.AddCorsWithCookieSupport(builder.Configuration);
+
+// ForwardedHeaders configuration for ALB HTTPS termination
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
+                               Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto |
+                               Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedHost;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // ForwardedHeaders configuration for ALB HTTPS termination
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -186,6 +231,35 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 // Antiforgery options binding (must be registered before building the app)
 builder.Services.Configure<AntiforgeryProtectionOptions>(
     builder.Configuration.GetSection("AntiforgeryProtection"));
+
+// Amazon S3 Configuration
+var awsSection = builder.Configuration.GetSection("AWS");
+var isCi = Environment.GetEnvironmentVariable("CI") == "true";
+var profileName = awsSection["Profile"] ?? (isCi ? string.Empty : throw new InvalidOperationException("AWS:Profile is not configured."));
+var region = awsSection["Region"] ?? (isCi ? string.Empty : throw new InvalidOperationException("AWS:Region is not configured."));
+var bucketName = awsSection["BucketName"] ?? (isCi ? string.Empty : throw new InvalidOperationException("AWS:BucketName is not configured."));
+
+Console.WriteLine($"AWS Profile: {profileName}");
+Console.WriteLine($"AWS Region: {region}");
+Console.WriteLine($"AWS Bucket: {bucketName}");
+
+if (isCi && (string.IsNullOrEmpty(profileName) || string.IsNullOrEmpty(region) || string.IsNullOrEmpty(bucketName)))
+{
+    Console.WriteLine("Running in CI: skipping AWS initialization.");
+}
+
+// Initialize AWSOptions using the profile
+var awsOptions = AWSOptions.FromProfile(profileName, region, bucketName);
+
+// Register AWSOptions and S3 client in DI
+builder.Services.AddSingleton(awsOptions);
+builder.Services.AddSingleton<IAmazonS3>(sp =>
+{
+    var options = sp.GetRequiredService<AWSOptions>();
+    return new AmazonS3Client(options.Credentials, options.Region);
+});
+
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
