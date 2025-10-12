@@ -3,16 +3,13 @@
 // </copyright>
 
 using System.IdentityModel.Tokens.Jwt;
-
 using Amazon;
 using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
 using Amazon.S3;
 using Amazon.SimpleEmailV2;
-
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
-
 using MeetlyOmni.Api.Common.Extensions;
 using MeetlyOmni.Api.Common.Options;
 using MeetlyOmni.Api.Data;
@@ -34,7 +31,6 @@ using MeetlyOmni.Api.Service.Invitation.Interfaces;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
 using Npgsql;
 
 var builder = default(WebApplicationBuilder);
@@ -123,7 +119,15 @@ builder.Services.AddSingleton<IJwtKeyProvider, JwtKeyProvider>();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
 // Authorization services (required for [Authorize])
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("SameOrganization", policy =>
+        policy.Requirements.Add(new MeetlyOmni.Api.Authorization.Requirements.SameOrganizationRequirement()));
+});
+
+// Register authorization handlers
+builder.Services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler,
+    MeetlyOmni.Api.Authorization.Handlers.SameOrganizationAuthorizationHandler<MeetlyOmni.Api.Data.Entities.Event>>();
 
 // ---- Repositories ----
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -183,8 +187,12 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "X-XSRF-TOKEN";
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() 
+        ? CookieSecurePolicy.None 
+        : CookieSecurePolicy.Always;
+    options.Cookie.SameSite = builder.Environment.IsDevelopment() 
+        ? SameSiteMode.Lax 
+        : SameSiteMode.None;
     options.Cookie.IsEssential = true;
     options.Cookie.Path = AuthCookieExtensions.CookiePaths.Root;
 
